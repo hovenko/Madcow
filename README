@@ -5,7 +5,7 @@ Madcow is the PHP web framework that leaves your application alone and only focu
 
 == STATE ==
 
-The project is currently in its early birth. I am currently fixing some last bugs related to URL routing, then it will be released. That will hopefully happen around November 28th. Yes, this year.
+The project is currently in its early birth. It is now available on Github (http://github.com/hovenko/Madcow).
 
 
 == TECHNICAL ==
