@@ -1,0 +1,64 @@
+= MADCOW =
+
+Madcow is the PHP web framework that leaves your application alone and only focuses on binding components together.
+
+
+== STATE ==
+
+The project is currently in its early birth. I am currently fixing some last bugs related to URL routing, then it will be released. That will hopefully happen around November 28th. Yes, this year.
+
+
+== TECHNICAL ==
+
+Madcow takes care of configuration, URL routing and page templating.
+
+It is a MVC framework that allows you to write your application in your own way. You use Madcow to tie it all together as a web application.
+
+Written in PHP 5. Comes with a Smarty view. Configuration in YAML.
+
+A SQL database model will be available coming soon.
+
+
+== HISTORY ==
+
+Madcow is a product of a web site I have been working on for the last year. One of the requirements of the project was to write the web application in PHP. Since none of the current PHP web frameworks, that I could find, were flexible enough for this project, I started on scratch.
+
+It started out as a single project, but at a period of the project, it became clear to me that the infrastructure of the application should be factored out to a new library.
+
+Madcow is very much inspired by the Perl web application framework Catalyst. What I like most about Catalyst is the support for chained actions, multiple models and multiple views. And because of that, these things are what I have focused on and implemented in Madcow.
+
+
+== AUTHORS ==
+
+Knut-Olav Hoven <knutolav@gmail.com>
+
+
+== LICENSE ==
+
+A copy of the license if provided in the LICENSE file in this distribution.
+The license of this software and any other part of this distribution, including files in sub directories, are licensed with the following MIT license.
+
+
+ Copyright (c) 2009 Knut-Olav Hoven, Hovens Datafeel
+
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without
+ restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following
+ conditions:
+
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+
