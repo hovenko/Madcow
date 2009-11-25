@@ -1,0 +1,48 @@
+= INSTALLATION =
+
+== PREPARE ==
+
+Figure out one of the include paths in your PHP installation.
+
+You can do that with the following command:
+ php -i |grep include_path
+
+Most likely one of /usr/share/php or /usr/lib/php will be suitable.
+
+
+== INSTALL ==
+
+Then copy the "DF.php" file and the "DF" directory from this package into
+one of the directories on the PHP include path.
+
+ $ sudo cp -R DF DF.php /usr/share/php/
+
+
+== DEPENDENCIES ==
+
+This library depends on some other PHP libraries.
+Some of them can be find in your OS distribution package repository,
+others in PHP PEAR and some you might download and install manually.
+
+ - Smarty
+ - Spyc
+ - log4php
+ - simpletest (for running the tests)
+ - File
+ - Log
+ - Cache_Lite
+
+Not all packages are required at all time,
+for example for logging only log4php or Log is required.
+
+
+== RUNNING TESTS ==
+
+Before using this library you should make sure all tests in the
+"tests" directory runs without any failures.
+
+Run the tests with this command:
+ php tests/all_tests.php
+
+
+
