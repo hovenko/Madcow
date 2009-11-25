@@ -16,7 +16,7 @@ It is a MVC framework that allows you to write your application in your own way.
 
 Written in PHP 5. Comes with a Smarty view. Configuration in YAML.
 
-A SQL database model will be available coming soon.
+A SQL database model will be available, coming soon.
 
 
 == HISTORY ==
