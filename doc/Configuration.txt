@@ -1,0 +1,18 @@
+= Configuration =
+
+== Current state ==
+
+Currently only YAML configuration files are supported.
+
+
+== YAML ==
+
+For the syntax of YAML files, see elsewhere... or see the examples.
+
+As a short and quick intro:
+ - no tabs are allowed, only spaces
+ - I recommend four spaces for every indentation
+ - key/value mapping separated with colon (:)
+ - list items is prepended with a hyphen (-)
+
+

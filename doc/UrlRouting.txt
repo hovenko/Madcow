@@ -1,0 +1,97 @@
+= URL Routing =
+
+A URL is mapped to an action in a controller.
+This mapping is configured in configuration, for example "config.yaml".
+
+
+== Current state ==
+
+Currently all actions must be chained.
+Path actions will come soon, a single action that will match a URL.
+
+
+== Simple ==
+
+A controller can have multiple actions.
+Actions can be chained.
+All chained actions will be executed in the order of the chain
+for an action that matches the requested URL.
+
+
+== Controllers ==
+
+Controllers are configured in the configuration file (see Configuration.txt).
+Actions are configuration in its controller configuration.
+
+
+== Chained actions ==
+
+Each action in a chained action configuration is matched to a part of the URL path.
+All chained actions are chained to the root "/".
+
+
+=== Example ===
+
+Here follows an example of a chained action:
+
+ Controller_Root:
+     namespace: ""
+     actions:
+         chained:
+             chained:    /
+             path:       ""
+         default:
+             chained:    chained
+             path:       ""
+             args:
+ 
+ Controller_Help:
+     actions:
+         show:
+             chained:    /chained
+             path:       help
+             args:       0
+
+The configuration example above will set up two chained action paths:
+ - /        (Controller: Root / action: default)
+ - /help    (Controller: Help / action: show)
+
+These two actions are called endpoints.
+Only actions with a configured "args" value, even if empty,
+are defined as endpoints.
+The "args" value defines how many path parts to capture after the matching URL path.
+An empty "args" value means that it will capture all remaining path parts.
+
+The "namespace" configuration of the "Root" controller, that is set to "",
+tells the application that this controller lives on the web root.
+If this configuration is not set, the default is to calculate the namespace
+from the name of the controller, in lowercase.
+Underscores in the controller name are replaced with slashes (/).
+In the case of the "Help" controller, the namespace of thhis controller is "help".
+
+The "/" path matches if no other action is matched.
+It is chained to the "chained" action in the same controller,
+the Root controller.
+Because of the empty "args" configuration value,
+if will capture all path parts after the matching URL path,
+in this case "/" which means all path parts of the URL.
+
+The "/help" path is chained to the chained action in the Root controller.
+Because the action is chained it will not automatically match the name of the controller or the configured namespace of the controller.
+Therefore we must set a "path" configuration value.
+It will only match an exact path because it takes 0 arguments.
+
+
+== Controller actions to object methods ==
+
+The class of the controller is found by prepending the application context class name to the configured controller name.
+In the example above, we have a configuration on the key "Controller_Root".
+If this was a configuration loaded from the application "MyApp",
+the controller class name would be "MyApp_Controller_Root".
+
+Action names are prepended with "handle_".
+In the case of the "default" action of the "Root" controller,
+the method executed would be "MyApp_Controller_Root::handle_default()".
+
+For all action methods, the first argument to the method is the context object.
+
