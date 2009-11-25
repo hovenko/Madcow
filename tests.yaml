@@ -1,0 +1,45 @@
+---
+
+View_Smarty:
+    debugging:  true
+
+Controller_Root:
+    namespace:  ""
+    actions:
+        chained:
+            # /
+            chained:    /
+            path:       ""
+
+Controller_Country:
+    namespace:  land
+    actions:
+        chained:
+            # /land/ES
+            chained:    /chained
+            path:       land
+            captures:   1
+        location_chained:
+            # /land/ES/sted/Costa%20Blanca
+            chained:    chained
+            path:       sted
+            captures:   1
+        country_page:
+            chained:    chained
+            path:       ""
+            args:       0
+
+Controller_Residences:
+    namespace:  boliger
+    actions:
+        chained:
+            # /land/ES/sted/Costa%20Blanca/bolig/MinBolig
+            chained:    /land/location_chained
+            path:       "bolig"
+            captures:   1
+        show:
+            # /land/ES/sted/Costa%20Blanca/bolig/MinBolig
+            chained:    chained
+            path:       ""
+            args:       0
+
