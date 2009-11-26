@@ -17,6 +17,11 @@ class DF_Error_InvalidArgumentException extends InvalidArgumentException
         if (!is_string($expected)) {
             throw new InvalidArgumentException("Not a string: expected");
         }
+
+        $lead = "Invalid";
+        if (NULL === $value) {
+            $lead = "Not set";
+        }
     
         $type = gettype($value);
         $got_msg = $type;
@@ -30,7 +35,7 @@ class DF_Error_InvalidArgumentException extends InvalidArgumentException
         $this->expected = $expected;
         $this->message = $msg;
         
-        $msg = "Invalid argument: $name - Got: $got_msg - Expected: $expected";
+        $msg = "$lead: $name - Got: $got_msg - Expected: $expected";
         parent::__construct($msg, 0);
     }
 
