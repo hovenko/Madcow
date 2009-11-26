@@ -19,6 +19,7 @@ class All_ULB_Tests extends GroupTest {
     public function All_ULB_Tests($name = "Running all ULB tests") {
         $this->GroupTest($name);
         $dir = dirname(__FILE__)."/";
+        $this->AddTestFile($dir.'Test_DF_URI.php');
         $this->AddTestFile($dir.'Test_DF_Validator.php');
         $this->AddTestFile($dir.'Test_DF_Web_uri_for.php');
         $this->AddTestFile($dir.'Test_DF_Web_HTTP_Path.php');
