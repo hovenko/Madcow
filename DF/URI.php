@@ -11,6 +11,7 @@ require_once 'DF/URI/Scheme.php';
 
 /**
  * 
+ * @author Knut-Olav Hoven <knutolav@gmail.com>
  */
 class DF_URI implements DF_URI_I {
     
