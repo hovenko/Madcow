@@ -36,7 +36,7 @@ class DF_URI implements DF_URI_I {
     public function __construct($string) {
         $this->string = $string;
         
-        $this->parseString($string);
+        $this->setup_string($string);
     }
     
     
@@ -49,7 +49,7 @@ class DF_URI implements DF_URI_I {
     }
     
     
-    private function parseString($string) {
+    private function setup_string($string) {
         $scheme = NULL;
         $hier   = NULL;
         $query  = NULL;
