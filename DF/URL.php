@@ -4,8 +4,11 @@
  */
 
 
+require_once 'DF/Error/InvalidArgumentException.php';
+
 require_once 'DF/URL/I.php';
 require_once 'DF/URL/MalformedURLException.php';
+require_once 'DF/URL/Path.php';
 
 
 /**
@@ -40,12 +43,12 @@ class DF_URL implements DF_URL_I {
         
         if (!$uri instanceof DF_URI_I) {
             $class = get_class($uri);
-            throw new InvalidArgumentException("Not of type DF_URI: uri. Was $class");
+            throw new DF_Error_InvalidArgumentException("uri", $uri, "DF_URI_I");
         }
         
         $this->uri = $uri;
         
-        $this->prepare_uri($uri);
+        $this->setup_hierarchical($uri->get_hierarchical());
     }
     
     
@@ -68,7 +71,7 @@ class DF_URL implements DF_URL_I {
     }
     
     
-    static protected function string_parse_authority($string) {
+    static private function string_parse_authority($string) {
         $user   = NULL;
         $host   = NULL;
         $port   = NULL;
@@ -99,12 +102,11 @@ class DF_URL implements DF_URL_I {
      * @param DF_URI_I $uri
      * @return string
      */
-    protected function prepare_uri($uri) {
-        $hier = $uri->get_hierarchical();
-        
-        if (preg_match('#^//([^/]+)(/.*)#', $hier, $m)) {
+    private function setup_hierarchical($hier) {
+        # Requires at least a character of the authority and a "/" of the path
+        if (preg_match('#^//([^/]+)/(.*)#', $hier, $m)) {
             $authority  = $m[1];
-            $path       = $m[2];
+            $path       = new DF_URL_Path($m[2]);
             
             $this->authority    = $authority;
             $this->path         = $path;
@@ -115,7 +117,7 @@ class DF_URL implements DF_URL_I {
             $this->port = $port;
         }
         else {
-            throw new DF_URL_MalformedURLException("Missing authority or path: $hier. URI: $uri");
+            throw new DF_URL_MalformedURLException("Missing authority or path: $hier");
         }
     }
     
@@ -165,7 +167,7 @@ class DF_URL implements DF_URL_I {
     }
     
     
-    public function get_string() {
+    protected function get_string() {
         return $this->uri->get_string();
     }
     
