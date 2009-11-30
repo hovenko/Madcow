@@ -106,6 +106,8 @@ class DF_URL implements DF_URL_I {
         # Requires at least a character of the authority and a "/" of the path
         if (preg_match('#^//([^/]+)/(.*)#', $hier, $m)) {
             $authority  = $m[1];
+
+            // All paths are relative, this one is relative to the root
             $path       = new DF_URL_Path($m[2]);
             
             $this->authority    = $authority;
