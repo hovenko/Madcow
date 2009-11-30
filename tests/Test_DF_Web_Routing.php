@@ -17,7 +17,9 @@ class Test_DF_Web_Routing extends UnitTestCase {
     }
 
     public function test_url_match() {
-        $url = "http://www.utenlandsbolig.no/land/ES";
+        $input = "http://www.utenlandsbolig.no/land/ES";
+        #$url = DF_URL::fromString($input);
+        $url = $input;
         $actions = $this->routing->find_actions_by_url($url);
         #error_log("Found ".count($actions). " actions");
         $this->assertTrue(count($actions) > 0);

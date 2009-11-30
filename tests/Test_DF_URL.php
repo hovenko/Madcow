@@ -21,7 +21,7 @@ class Test_DF_URL extends UnitTestCase {
         $input  = "http://localhost";
 
         try {
-            $uri = DF_URL::fromString($input);
+            $url = DF_URL::fromString($input);
             $this->fail("URL without a path is not a valid URL");
         }
         catch (DF_URL_MalformedURLException $e) {
@@ -34,36 +34,36 @@ class Test_DF_URL extends UnitTestCase {
     function test_simple() {
         $input  = "http://localhost/";
 
-        $uri = DF_URL::fromString($input);
+        $url = DF_URL::fromString($input);
 
         $this->assertEqual(
-            "$uri",
+            "$url",
             $input
         );
 
         $this->assertEqual(
-            $uri->get_scheme()."",
+            $url->get_scheme()."",
             "http"
         );
 
         $this->assertEqual(
-            $uri->get_hierarchical()."",
+            $url->get_hierarchical()."",
             "//localhost/"
         );
 
         $this->assertEqual(
-            $uri->get_authority()."",
+            $url->get_authority()."",
             "localhost"
         );
 
         $this->assertEqual(
-            $uri->get_host()."",
+            $url->get_host()."",
             "localhost"
         );
 
         $this->assertEqual(
-            $uri->get_path()."",
-            "/"
+            $url->get_path()."",
+            ""
         );
     }
 
@@ -71,16 +71,42 @@ class Test_DF_URL extends UnitTestCase {
     function test_longer_hierarchical() {
         $input  = "http://localhost/some/file.html";
 
-        $uri = DF_URL::fromString($input);
+        $url = DF_URL::fromString($input);
 
         $this->assertEqual(
-            "$uri",
+            "$url",
             $input
         );
 
         $this->assertEqual(
-            $uri->get_path()."",
-            "/some/file.html"
+            $url->get_path()."",
+            "some/file.html"
+        );
+
+        $path = $url->get_path();
+        $this->assertFalse(
+            # All paths of URLs are relative (to the root)
+            $path->is_absolute()
+        );
+    }
+
+
+    function test_path_absolute() {
+        $input = "/some/file.html";
+
+        $path = new DF_URL_Path($input);
+        $this->assertTrue(
+            $path->is_absolute()
+        );
+    }
+
+
+    function test_path_relative() {
+        $input = "some/file.html";
+
+        $path = new DF_URL_Path($input);
+        $this->assertFalse(
+            $path->is_absolute()
         );
     }
 
@@ -88,15 +114,15 @@ class Test_DF_URL extends UnitTestCase {
     function test_port() {
         $input  = "http://localhost:8080/";
 
-        $uri = DF_URL::fromString($input);
+        $url = DF_URL::fromString($input);
 
         $this->assertEqual(
-            "$uri",
+            "$url",
             $input
         );
 
         $this->assertEqual(
-            $uri->get_port()."",
+            $url->get_port()."",
             "8080"
         );
     }
@@ -105,15 +131,15 @@ class Test_DF_URL extends UnitTestCase {
     function test_user() {
         $input  = "http://user:pass@localhost/";
 
-        $uri = DF_URL::fromString($input);
+        $url = DF_URL::fromString($input);
 
         $this->assertEqual(
-            "$uri",
+            "$url",
             $input
         );
 
         $this->assertEqual(
-            $uri->get_user()."",
+            $url->get_user()."",
             "user:pass"
         );
     }
