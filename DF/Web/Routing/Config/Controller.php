@@ -58,7 +58,7 @@ class DF_Web_Routing_Config_Controller
     protected function prepare_path() {
         $path = $this->namespace;
 
-        return new DF_Web_Path("$path");
+        return DF_Web_Path::fromString("$path");
     }
 
 

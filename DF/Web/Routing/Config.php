@@ -39,6 +39,13 @@ class DF_Web_Routing_Config {
     }
 
 
+    public function __toString() {
+        $path = $this->path;
+        $name   = $this->name;
+        return "$name";
+    }
+
+
     public function get_name() {
         return $this->name;
     }

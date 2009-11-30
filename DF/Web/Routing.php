@@ -1,5 +1,6 @@
 <?php
 
+
 require_once 'DF/Web/Action.php';
 require_once 'DF/Web/Exception.php';
 require_once 'DF/Web/Routing/ActionFactory.php';
@@ -8,6 +9,7 @@ require_once 'DF/Web/Routing/Action/PathMismatchException.php';
 require_once 'DF/Web/Routing/Component/Name.php';
 require_once 'DF/Web/Routing/Config/Controller.php';
 require_once 'DF/Web/URL.php';
+
 
 class DF_Web_Routing {
     public static $LOGGER = NULL;
@@ -90,10 +92,10 @@ class DF_Web_Routing {
                 }
             }
 
-            if (!$path->is_absolute()) {
-                $rootpath = new DF_Web_Path("/");
+            #if (!$path->is_absolute()) {
+                $rootpath = DF_Web_Path::fromString("/");
                 $path = $rootpath->append_path($path);
-            }
+            #}
 
             $chain = array_reverse($chain);
             $resolved["$path"][] = $chain;
@@ -153,7 +155,7 @@ class DF_Web_Routing {
 
             if (isset($paths["$path"])) {
                 $found = $paths["$path"]->get_name();
-                throw new DF_Web_Exception("Namespace already configured on controller $found: $path");
+                throw new DF_Web_Exception("Namespace for $controller already configured on controller $found: $path");
             }
 
             $paths["$path"] = $controller;
@@ -209,7 +211,7 @@ class DF_Web_Routing {
     
         foreach ($this->chained as $actionpath => $chained) {
             foreach ($chained as $actions) {
-                $actionpath = new DF_Web_Path("$actionpath");
+                $actionpath = DF_Web_Path::fromString("$actionpath");
                 $reason = "";
 
                 $score = -1;
@@ -474,7 +476,7 @@ class DF_Web_Routing {
 
     public function find_actions_by_path($path) {
         if (!$path instanceof DF_Web_Path) {
-            throw new InvalidArgumentException("Not of type DF_Web_Path: path");
+            throw new DF_Error_InvalidArgumentException("path", $path, "DF_Web_Path");
         }
         
         $ret = array();
@@ -538,7 +540,7 @@ class DF_Web_Routing {
 
 
     public function find_actions_by_url($url) {
-        $url    = new DF_Web_URL($url);
+        $url    = DF_Web_URL::fromString($url);
         $path   = $url->get_path();
         #$path   = new DF_Web_Path($url);
 

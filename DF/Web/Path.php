@@ -1,50 +1,40 @@
 <?php
 
 
+require_once 'DF/URL/Path/I.php';
+
 require_once 'DF/Web/HTTP/Path.php';
 require_once 'DF/Web/Path/Part.php';
 
 
-class DF_Web_Path {
+class DF_Web_Path implements DF_URL_Path_I {
 
-    protected $string = NULL;
+    protected $path = NULL;
 
-    public function __construct($string) {
-        if (NULL === $string) {
-            throw new InvalidArgumentException("Not set: string");
+
+
+    public function __construct($path) {
+        if (NULL === $path) {
+            throw new InvalidArgumentException("Not set: path");
         }
 
-        if (!is_string($string)) {
-            $type = gettype($string);
-            if ($type == 'object') {
-                $class = get_class($string);
-                $type = "object($class)";
-            }
-            throw new InvalidArgumentException("Not a string: string Was: $type");
+        if (!$path instanceof DF_URL_Path_I) {
+            throw new DF_Error_InvalidArgumentException("path", $path, "DF_URL_Path_I");
         }
 
-        $this->string = $string;
+        $this->path = $path;
+    }
+
+
+    static public function fromString($string) {
+        require_once 'DF/URL/Path.php';
+        $path = new DF_URL_Path($string);
+        return new DF_Web_Path($path);
     }
 
 
     public function is_absolute() {
-        if (strpos($this->string, '/') === 0) {
-            return true;
-        }
-
-        return false;
-    }
-
-
-    protected function has_trailing_slash() {
-        $string = $this->string;
-
-        $last_idx = strlen($string) - 1;
-        if ($string[$last_idx] == "/") {
-            return true;
-        }
-
-        return false;
+        return $this->path->is_absolute();
     }
 
 
@@ -75,7 +65,7 @@ class DF_Web_Path {
             $new_path = "/$new_path";
         }
 
-        return new DF_Web_Path($new_path);
+        return DF_Web_Path::fromString($new_path);
     }
 
 
@@ -101,39 +91,39 @@ class DF_Web_Path {
 
         $new_path = "$base_str$sub_str";
 
-        return new DF_Web_Path($new_path);
+        return DF_Web_Path::fromString($new_path);
     }
 
 
-    protected function toString() {
-        return $this->string;
+    public function has_trailing_slash() {
+        return $this->path->has_trailing_slash();
     }
 
 
     public function __toString() {
-        return "".$this->toString();
+        return "".$this->path;
     }
 
     
     public function has_base_path($base_path) {
-        return DF_Web_HTTP_Path::has_base_path($this->string, $base_path);
+        return DF_Web_HTTP_Path::has_base_path($this->path."", $base_path);
     }
 
 
     public function get_path_stripped_base($base_path) {
-        $stripped = DF_Web_HTTP_Path::strip_base_path($this->string, $base_path);
+        $stripped = DF_Web_HTTP_Path::strip_base_path($this->path."", $base_path);
         return new DF_Web_Path($stripped);
     }
 
 
     public function get_path_stripped_query_params() {
-        $stripped = DF_Web_HTTP_Path::strip_query_params($this->string);
+        $stripped = DF_Web_HTTP_Path::strip_query_params($this->path."");
         return new DF_Web_Path($stripped);
     }
 
 
     public function get_params() {
-        $arr = DF_Web_HTTP_Path::split_params($this->string);
+        $arr = DF_Web_HTTP_Path::split_params($this->path."");
         $stripped   = $arr[0];
         $query      = $arr[1];
 
@@ -142,11 +132,11 @@ class DF_Web_Path {
     
 
     public function get_path_parts() {
-        $arr = DF_Web_HTTP_Path::split_parts($this->string);
+        $arr = DF_Web_HTTP_Path::split_parts($this->path."");
         $parts = array();
 
         foreach ($arr as $str) {
-            $part = new DF_Web_Path_Part($str);
+            $part = DF_Web_Path_Part::fromString($str);
             $parts[] = $part;
         }
 

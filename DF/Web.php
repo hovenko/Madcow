@@ -341,14 +341,22 @@ class DF_Web {
             case 'https':
                 return $uri;
 
-            case 'ulb':
-                $uri = $this->resolve_ulb_uri($rest);
+            case 'madcow':
+                $uri = $this->resolve_madcow_uri($rest);
                 return $this->resolve_uri($uri);
-
-            default:
-                throw new DF_Web_Exception("Don't know how to handle schema: $schema");
         }
 
+        return $this->resolve_uri_local($uri);
+    }
+
+
+    protected function resolve_uri_local($uri) {
+        $parts = $this->split_uri($uri);
+
+        $schema = $parts['schema'];
+        $rest   = $parts['rest'];
+
+        throw new DF_Web_Exception("Don't know how to handle schema: $schema");
     }
 
 
@@ -376,7 +384,7 @@ class DF_Web {
     }
 
 
-    public function resolve_ulb_uri($uri) {
+    public function resolve_madcow_uri($uri) {
         preg_match('|^(\w+):(.*)|', $uri, $matches);
         $schema = $matches[1];
         $rest   = $matches[2];
@@ -386,7 +394,7 @@ class DF_Web {
                 return $this->uri_for($rest);
 
             default:
-                throw new DF_Web_Exception("Unknown ulb schema: $schema");
+                throw new DF_Web_Exception("Unknown madcow schema: $schema");
         }
     }
 
@@ -395,7 +403,7 @@ class DF_Web {
     public function execute() {
         $request    = $this->request;
 
-        $path = new DF_Web_Path($request->get_path());
+        $path       = DF_Web_Path::fromString($request->get_path());
         $actions    = $this->routing->find_actions_by_path($path);
         
         if (!$actions) {

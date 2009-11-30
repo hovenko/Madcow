@@ -79,7 +79,7 @@ class DF_Web_Routing_Action {
         $path = $this->get_path();
 
         if ($argspath) {
-            $path = $path->append_path(new DF_Web_Path($argspath));
+            $path = $path->append_path(DF_Web_Path::fromString($argspath));
         }
         
         return $path;

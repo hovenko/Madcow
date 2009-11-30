@@ -1,89 +1,89 @@
 <?php
 
 
+require_once 'DF/URL.php';
+require_once 'DF/URL/I.php';
+
 require_once 'DF/Web/HTTP/Path.php';
 require_once 'DF/Web/Path/Part.php';
 
 
-class DF_Web_URL {
+class DF_Web_URL implements DF_URL_I {
 
-    protected $string   = NULL;
+    protected $url      = NULL;
 
-    protected $schema   = NULL;
-    protected $host    = NULL;
-    protected $port    = NULL;
-    protected $path    = NULL;
-    protected $query    = NULL;
+    protected $path     = NULL;
 
 
-    public function __construct($string) {
-        if (NULL === $string) {
-            throw new InvalidArgumentException("Not set: string");
+
+    public function __construct($url) {
+        if (NULL === $url) {
+            throw new InvalidArgumentException("Not set: url");
         }
 
-        if (!is_string($string)) {
-            throw new InvalidArgumentException("Not a string: string");
+        if (!$url instanceof DF_URL_I) {
+            throw new DF_Error_InvalidArgumentException("url", $url, "DF_URL_I");
         }
 
-        $this->string = $string;
+        $this->url = $url;
 
-        $this->init_url($string);
+        $this->path = new DF_Web_Path($url->get_path());
     }
 
 
-    protected function init_url($string) {
-        $schema = NULL;
-        $host   = NULL;
-        $port   = NULL;
-        $path   = NULL;
-        $query  = NULL;
-
-        if (preg_match('#^([^:]+)://([^:/]+)(?::([^/]))?(/[^\?]*)(?:\?(.*))?#', $string, $matches)) {
-            $schema = $matches[1];
-            $host   = $matches[2];
-            $port   = $matches[3];
-            $path   = $matches[4];
-            $query  = $matches[5];
-        }
-        else {
-            throw new InvalidArgumentException("URL malformed: $string");
-        }
-
-        $this->schema   = $schema;
-        $this->host     = $host;
-        $this->port     = $port;
-        $this->path     = $path;
-        $this->query    = $query;
+    static public function fromString($string) {
+        $url = DF_URL::fromString($string);
+        return new DF_Web_URL($url);
     }
 
 
     public function __toString() {
-        $schema = $this->schema;
-        $host   = $this->host;
-        $port   = $this->port;
-        $path   = $this->path;
-        $query  = $this->query;
-
-        $str = "$schema://$host";
-
-        if ($port) {
-            $str .= ":$port";
-        }
-        
-        $str .= "$path";
-
-        if ($query) {
-            $str .= "?$query";
-        }
-
-        return $str;
+        return "".$this->url;
     }
 
 
     public function get_path() {
-        $path = new DF_Web_Path($this->path);
-        return $path;
+        return $this->path;
+    }
+
+
+    public function get_authority() {
+        return $this->url->get_authority();
+    }
+    
+    
+    public function get_user() {
+        return $this->url->get_user();
     }
 
     
+    public function get_host() {
+        return $this->url->get_host();
+    }
+
+    
+    public function get_port() {
+        return $this->url->get_port();
+    }
+
+
+    public function get_scheme() {
+        return $this->url->get_scheme();
+    }
+
+    
+    public function get_hierarchical() {
+        return $this->url->get_hierchical();
+    }
+
+    
+    public function get_query() {
+        return $this->url->get_query();
+    }
+
+    
+    public function get_fragment() {
+        return $this->url->get_fragment();
+    }
+
 }

@@ -42,7 +42,7 @@ class DF_Web_Routing_Config_Action
             $path = $this->get_name();
         }
 
-        return new DF_Web_Path("$path");
+        return DF_Web_Path::fromString("$path");
     }
 
 

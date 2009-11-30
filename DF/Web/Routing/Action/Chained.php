@@ -47,10 +47,10 @@ class DF_Web_Routing_Action_Chained
 
     protected function prepare_chained() {
         $chained        = $this->get_config_chained();
-        $chained_path   = new DF_Web_Path($chained);
+        $chained_path   = DF_Web_Path::fromString($chained);
 
         if (!$chained_path->is_absolute()) {
-            $controller = new DF_Web_Path("/".$this->controller->get_path());
+            $controller = DF_Web_Path::fromString("/".$this->controller->get_path());
             $chained_path = $controller->append_path($chained_path);
         }
 
@@ -86,7 +86,7 @@ class DF_Web_Routing_Action_Chained
         #}
 
         if ($argspath) {
-            $path = $path->append_path(new DF_Web_Path($argspath));
+            $path = $path->append_path(DF_Web_Path::fromString($argspath));
         }
         
         return $path;

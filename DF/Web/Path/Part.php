@@ -10,19 +10,34 @@ require_once 'DF/Web/Path.php';
 /**
  */
 class DF_Web_Path_Part
-        extends DF_Web_Path {
+        implements DF_URL_Path_I {
     
-    protected $string = NULL;
+    protected $part = NULL;
 
 
     /**
      * Constructor.
      * 
-     * @param string $string
+     * @param DF_URL_Path_I $part
      * @return DF_Web_Path_Part
      */
-    public function __construct($string) {
-        parent::__construct($string);
+    public function __construct($part) {
+        if (NULL === $part) {
+            throw new InvalidArgumentException("Not set: part");
+        }
+
+        if (!$part instanceof DF_URL_Path_I) {
+            throw new DF_Error_InvalidArgumentException("part", $part, "DF_URL_Path_I");
+        }
+
+        $this->part = $part;
+    }
+
+
+    static public function fromString($string) {
+        require_once 'DF/Web/Path.php';
+        $path = DF_Web_Path::fromString($string);
+        return new DF_Web_Path_Part($path);
     }
 
 
@@ -40,7 +55,8 @@ class DF_Web_Path_Part
             return true;
         }
 
-        if ($other->string == $this->string) {
+        if ("".$other == "".$this) {
+            // equal string-wise
             return true;
         }
 
@@ -48,7 +64,7 @@ class DF_Web_Path_Part
     }
 
 
-    protected function has_trailing_slash() {
+    public function has_trailing_slash() {
         return false;
     }
 
@@ -58,5 +74,8 @@ class DF_Web_Path_Part
     }
     
 
+    public function __toString() {
+        return "".$this->part;
+    }
 
 }
