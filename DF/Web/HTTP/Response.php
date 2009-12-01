@@ -36,6 +36,15 @@ class DF_Web_HTTP_Response {
     }
 
 
+    public function content_type($type) {
+        if (NULL !== $type) {
+            $this->content_type = $type;
+        }
+
+        return $this->content_type;
+    }
+
+
     public function status($status) {
         if (!is_int($status)) {
             throw new DF_Web_Exception("HTTP status must be an integer");
