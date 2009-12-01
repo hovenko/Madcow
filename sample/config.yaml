@@ -1,0 +1,20 @@
+---
+
+Controller_Root:
+    namespace:  ""
+    actions:
+        chained:
+            # Chained: /
+            chained:    /
+            path:       ""
+        index:
+            # Matches: /
+            chained:    chained
+            path:       ""
+            args:       0
+        default:
+            # Matches: /*
+            chained:    chained
+            path:       ""
+            args:
+

@@ -1,0 +1,13 @@
+#
+# Copy, move or symlink this to .htaccess
+# or setup Apache web server with similar settings.
+#
+
+SetEnv ENVIRONMENT 'development'
+
+RewriteEngine On
+RewriteBase /~user/madcow-sample/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /~user/madcow-sample/index.php
+
