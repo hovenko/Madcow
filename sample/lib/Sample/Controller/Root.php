@@ -30,7 +30,7 @@ class Sample_Controller_Root extends DF_Web_Controller {
     # The default page, see config.yaml
     # Fallbacks to this if on other actions match
     public function handle_default($c) {
-        error_log("This is Root/index");
+        error_log("This is Root/default");
         $c->response->status(404);
         $c->response->content_type('text/plain');
         $c->response->body("Nothing found");
