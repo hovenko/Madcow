@@ -22,8 +22,18 @@ class DF_Logger_ErrorLog {
     }
 
 
+    public function error($msg) {
+        $this->_log($msg, 'error');
+    }
+
+
     public function warn($msg) {
         $this->_log($msg, 'warn');
+    }
+
+
+    public function info($msg) {
+        $this->_log($msg, 'info');
     }
 
 
@@ -37,6 +47,11 @@ class DF_Logger_ErrorLog {
             default:
                 return strtoupper($sev);
         }
+    }
+
+
+    static public function shutdown() {
+        # nothing
     }
 }
 
