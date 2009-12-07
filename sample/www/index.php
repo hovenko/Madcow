@@ -2,15 +2,16 @@
 
 $DIR_SCRIPT = dirname(__FILE__);
 $DIR_ROOT   = "$DIR_SCRIPT/..";
-$DIR_LIB    = "{$DIR_ROOT}/lib";
+$DIR_LIB    = "$DIR_ROOT/lib";
 
+# No need to add the Madcow library directory to the PHP include
+# path if Madcow is properly installed in the systems include path.
 $MADCOW_LIB = "$DIR_ROOT/..";
 
 $DIR_LIB    = "$DIR_LIB:$MADCOW_LIB";
 
 set_include_path($DIR_LIB.':'.get_include_path());
 
-#define('LOG4PHP_CONFIGURATION', dirname(__FILE__).'/../logger.conf');
 require_once 'DF/Web/Logger.php';
 DF_Web_Logger::setActiveLogger('error_log');
 
