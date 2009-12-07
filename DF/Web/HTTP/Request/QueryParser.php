@@ -3,7 +3,7 @@
 class DF_Web_HTTP_Request_QueryParser {
     static public function build_query_params($search, $prefix = 's') {
         if (!$search) {
-            return '';
+            return array();
         }
 
         $list = array();
@@ -25,8 +25,19 @@ class DF_Web_HTTP_Request_QueryParser {
 
 
     private static function flatten_query_structure(&$list, $name, $part, $value) {
-        if ($part) {
-            $name .= '.' . $part;
+        if (!is_string($name)) {
+            throw new DF_Error_InvalidArgumentException('name', $name, 'string');
+        }
+
+        if (NULL === $part) {
+            $part = "";
+        }
+
+        if (!strlen($name)) {
+            $name = $part;
+        }
+        elseif (strlen($part)) {
+            $name .= ".$part";
         }
 
         if (is_array($value)) {
@@ -42,6 +53,10 @@ class DF_Web_HTTP_Request_QueryParser {
 
 
     static public function parse_query_params($params) {
+        if (!is_array($params)) {
+            throw new DF_Error_InvalidArgumentException('params', $params, 'array');
+        }
+        
         $p = array();
         foreach ($params as $key => $val) {
             $key_parts = NULL;

@@ -11,12 +11,29 @@ class Test_DF_Web_HTTP_Request_QueryParser extends UnitTestCase {
         $this->UnitTestCase($name);
     }
 
-    function testEmpty() {
+    function test_empty() {
         $query  = array();
 
         $parsed = DF_Web_HTTP_Request_QueryParser::parse_query_params($query);
 
         $this->assertEqual(0, sizeof($parsed));
+
+        $parsed = DF_Web_HTTP_Request_QueryParser::build_query_params($query);
+        $this->assertEqual(array(), $parsed);
+    }
+
+
+    function test_list_indexed() {
+        $query  = array(
+            'key.0' => 'val1',
+            'key.1' => 'val2',
+        );
+
+        $expect = "key.0=val1&key.1=val2";
+
+        $string = DF_Web_HTTP_Request_QueryParser::build_query_params_string($query, "");
+
+        $this->assertEqual($expect, $string);
     }
 
 
