@@ -154,3 +154,9 @@ if (getenv('ENVIRONMENT')) {
 DF_Web_Logger::shutdown();
 EOF;
 file_put_contents("$nice/www/index.php", $index);
+
+echo "\n";
+echo "SUCCESS - soon ready to use\n";
+echo "\n";
+echo "You might have to symlink the $nice/www directory to your Apache (or other web server) web application folder and configure $nice/www/.htaccess rewrite rules\n";
+echo "\n";
