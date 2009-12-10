@@ -88,7 +88,11 @@ class DF_Web_Routing_Config_Controller
 
     protected function get_config_actions() {
         if ($this->has('actions')) {
-            return $this->get('actions');
+            $actions = $this->get('actions');
+            if (!is_array($actions)) {
+                throw new DF_Error_InvalidArgumentException('Controller configuration "actions"', $actions, "array");
+            }
+            return $actions;
         }
 
         return array();
