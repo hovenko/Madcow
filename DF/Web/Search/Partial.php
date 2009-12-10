@@ -15,6 +15,11 @@ class DF_Web_Search_Partial implements DF_Web_Search_Partial_I {
 
     
 
+    /**
+     * Constructor.
+     *
+     * @return DF_Web_Search_Partial
+     */
     public function __construct($key, $value, $partial) {
         $this->key      = $key;
         $this->value    = new DF_Web_Search($value);
