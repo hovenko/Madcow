@@ -20,8 +20,11 @@ if (file_exists($nice)) {
     die("A file exists by that name: $nice\n");
 }
 
+$path   = preg_replace('|_|', "/", $name);
+
 mkdir($nice);
 mkdir("$nice/lib");
+mkdir("$nice/lib/$path", 0777, true);
 
 $context = <<<EOF
 <?php
@@ -29,10 +32,9 @@ require_once 'DF/Web.php';
 class $name extends DF_Web {
 }
 EOF;
-file_put_contents("$nice/lib/$name.php", $context);
+file_put_contents("$nice/lib/$path.php", $context);
 
 
-mkdir("$nice/lib/$name");
 
 $config = <<<EOF
 ---
@@ -40,26 +42,26 @@ $config = <<<EOF
 Controller_Root:
     namespace:  ""
     actions:
-    chained:
-        # Chained: /
-        chained:    /
-        path:       ""
-    index:
-        # Matches: /
-        chained:    chained
-        path:       ""
-        args:       0
-    default:
-        # Matches: /*
-        chained:    chained
-        path:       ""
-        args:
+        chained:
+            # Chained: /
+            chained:    /
+            path:       ""
+        index:
+            # Matches: /
+            chained:    chained
+            path:       ""
+            args:       0
+        default:
+            # Matches: /*
+            chained:    chained
+            path:       ""
+            args:
 EOF;
 file_put_contents("$nice/config.yaml", $config);
 
-mkdir("$nice/lib/$name/Controller");
-mkdir("$nice/lib/$name/Model");
-mkdir("$nice/lib/$name/View");
+mkdir("$nice/lib/$path/Controller");
+mkdir("$nice/lib/$path/Model");
+mkdir("$nice/lib/$path/View");
 
 $root_ctrl = <<<EOF
 <?php
@@ -98,7 +100,7 @@ class ${name}_Controller_Root extends DF_Web_Controller {
     }
 }
 EOF;
-file_put_contents("$nice/lib/$name/Controller/Root.php", $root_ctrl);
+file_put_contents("$nice/lib/$path/Controller/Root.php", $root_ctrl);
 
 
 mkdir("$nice/www");
@@ -127,7 +129,7 @@ set_include_path(\$DIR_LIB.':'.get_include_path());
 require_once 'DF/Web/Logger.php';
 DF_Web_Logger::setActiveLogger('error_log');
 
-require_once '$name.php';
+require_once '$path.php';
 
 \$environment = DF_Web_Environment::singleton();
 \$environment->app_root = \$DIR_ROOT;
