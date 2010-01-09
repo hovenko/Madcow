@@ -40,6 +40,11 @@ class DF_Web_Search_EmptyPartial implements DF_Web_Search_Partial_I {
     }
 
 
+    public function getSemiPartials() {
+        return array();
+    }
+
+
     public function getPartial($field) {
         return $this->partial->getPartial($field);
     }
