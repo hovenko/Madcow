@@ -256,6 +256,10 @@ class DF_Web {
     }
 
     public function view($name) {
+        if (NULL == $name) {
+            throw new DF_Error_InvalidArgumentException("name", $name, "string");
+        }
+
         $classname = $this->get_context_class();
         $prefix = "{$classname}_View_";
 
@@ -435,7 +439,7 @@ class DF_Web {
 
                         $ret = $this->execute_action($autoaction);
                         if (!$ret) {
-                            throw new DF_Web_Detach_Exception("Returned false from $name/handle_auto");
+                            throw new DF_Web_Detach_Exception($autoaction, "Returned false from $name/handle_auto");
                         }
                     }
                 }
@@ -867,6 +871,12 @@ class DF_Web {
                 $viewname = $this->stash['current_view'];
             }
             
+            if (!$viewname) {
+                $err = new DF_Web_Exception("No view selected");
+                $this->add_error($err);
+                return $this->finalize_error();
+            }
+
             $this->stash['debug_dump']['stash']     = print_r($this->stash, true);
             $this->stash['debug_dump']['session']   = print_r($this->session, true);
 
