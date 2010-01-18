@@ -256,10 +256,6 @@ class DF_Web {
     }
 
     public function view($name) {
-        if (NULL == $name) {
-            throw new DF_Error_InvalidArgumentException("name", $name, "string");
-        }
-
         $classname = $this->get_context_class();
         $prefix = "{$classname}_View_";
 
@@ -306,6 +302,14 @@ class DF_Web {
     }
 
     private function component_prefixed($prefix, $name) {
+        if (NULL == $prefix) {
+            throw new DF_Error_InvalidArgumentException("prefix", $prefix, "string");
+        }
+
+        if (NULL == $name) {
+            throw new DF_Error_InvalidArgumentException("name", $name, "string");
+        }
+
         $class  = "{$prefix}{$name}";
         return $this->component($class);
     }
@@ -476,8 +480,14 @@ class DF_Web {
                 array($ex)
             );
 
-            $this->execute_action($action_err);
-            $lastaction = $action_err;
+            try {
+                $this->execute_action($action_err);
+                $lastaction = $action_err;
+            }
+            catch (DF_Web_Exception $inner_ex) {
+                self::$LOGGER->info("No Error controller to dispatch exception to");
+                $this->add_error($ex);
+            }
         }
 
         if ($lastend) {
