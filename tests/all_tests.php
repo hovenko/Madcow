@@ -22,6 +22,7 @@ class All_ULB_Tests extends GroupTest {
         $this->AddTestFile($dir.'Test_DF_URI.php');
         $this->AddTestFile($dir.'Test_DF_URL.php');
         $this->AddTestFile($dir.'Test_DF_Validator.php');
+        $this->AddTestFile($dir.'Test_DF_Web_resolve_uri.php');
         $this->AddTestFile($dir.'Test_DF_Web_uri_for.php');
         $this->AddTestFile($dir.'Test_DF_Web_HTTP_Path.php');
         $this->AddTestFile($dir.'Test_DF_Web_HTTP_Request_QueryParser.php');
