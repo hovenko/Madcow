@@ -1,0 +1,16 @@
+Database and elements persist
+
+When storing elements we need to run the update or insert routines in a transaction.
+All update and insert statements in the database needs to run in the same transaction.
+
+Maybe the elements should have only one method to update the database data:
+ persist()
+
+Calling persist() on an elements should:
+ start the transaction
+ prepare all data for storage; relations, entity partials
+ passing on the element to the database
+ the database calls on the element to update or insert the elements data, with a reference to itself
+
+The persist() method needs to be separated from the normal update and insert methods of the element.
+
