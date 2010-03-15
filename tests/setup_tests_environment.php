@@ -10,8 +10,7 @@ DF_Web_Logger::setActiveLogger('log4php');
 require_once 'simpletest/unit_tester.php';
 require_once 'simpletest/reporter.php';
 
-require_once 'DF/Web/Config.php';
-require_once 'DF/Web/Environment.php';
+require_once 'DF/Web.php';
 
 $environment = DF_Web_Environment::singleton();
 $environment->app_root = "$dir/..";

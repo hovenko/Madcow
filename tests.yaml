@@ -43,3 +43,6 @@ Controller_Residences:
             path:       ""
             args:       0
 
+Model_Testmodel:
+    aaa:    new_value
+

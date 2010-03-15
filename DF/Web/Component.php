@@ -1,6 +1,7 @@
 <?php
 
 require_once 'DF/Web/Component/Loader.php';
+require_once 'DF/Web/Utils/Config.php';
 
 
 /**
@@ -16,11 +17,8 @@ class DF_Web_Component {
     }
 
     public function config($config = NULL) {
-        if ($config === NULL) {
-            return $this->config;
-        }
-
-        $this->config = array_merge($this->config, $config);
+        $this->config = DF_Web_Utils_Config::merge_hashes($this->config, $config);
+        return $this->config;
     }
 
     

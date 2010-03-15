@@ -223,6 +223,10 @@ class DF_Web {
 
 
     public function component($class) {
+        if (!is_string($class)) {
+            throw new DF_Error_InvalidArgumentException("class", $class, "string");
+        }
+        
         #self::$LOGGER->debug("Looking up component: $class");
         $component = NULL;
 
@@ -255,7 +259,12 @@ class DF_Web {
         return $classname;
     }
 
+
     public function view($name) {
+        if (!is_string($name)) {
+            throw new DF_Error_InvalidArgumentException("name", $name, "string");
+        }
+        
         $classname = $this->get_context_class();
         $prefix = "{$classname}_View_";
 
@@ -267,8 +276,13 @@ class DF_Web {
             throw new DF_Web_Exception($ex->getMessage());
         }
     }
+    
 
     public function model($name) {
+        if (!is_string($name)) {
+            throw new DF_Error_InvalidArgumentException("name", $name, "string");
+        }
+        
         if (isset($this->config['testmodels'])) {
             $testmodels = $this->config['testmodels'];
             if (isset($this->config['testmodels'][$name])) {
@@ -288,7 +302,12 @@ class DF_Web {
         }
     }
 
+
     public function controller($name) {
+        if (!is_string($name)) {
+            throw new DF_Error_InvalidArgumentException("name", $name, "string");
+        }
+        
         $classname = $this->get_context_class();
         $prefix = "{$classname}_Controller_";
 
