@@ -1258,6 +1258,10 @@ EOHTML;
     static public function path_to() {
         // app_root should already be suffixed with /
         $home = DF_Web_Environment::singleton()->app_root;
+
+        if (!preg_match('#/$#', $home)) {
+            $home .= "/";
+        }
         
         $args = func_get_args();
         if ($args) {
