@@ -19,6 +19,7 @@ require_once 'DF/Web/Model.php';
 require_once 'DF/Web/Routing.php';
 require_once 'DF/Web/SessionHandler.php';
 require_once 'DF/Web/Time.php';
+require_once 'DF/Web/Utils/Arguments.php';
 require_once 'DF/Web/View.php';
 
 
@@ -652,26 +653,7 @@ class DF_Web {
 
 
     static protected function flatten_arguments_list($arguments) {
-        $str = array();
-
-        foreach ($arguments as $arg) {
-            if (NULL === $arg) {
-                $str[] = "NULL";
-            }
-            elseif (gettype($arg) == 'object') {
-                $str[] = get_class($arg);
-            }
-            elseif (gettype($arg) == 'string') {
-                $str[] = '"'.$arg.'"';
-            }
-            else {
-                $type = gettype($arg);
-                error_log("Building argument list. Unknown type: $type - value: $arg");
-                $str[] = '"'.$arg.'"';
-            }
-        }
-
-        return join(', ', $str);
+        return DF_Web_Utils_Arguments::flatten_arguments_list($arguments);
     }
 
 
@@ -682,11 +664,8 @@ class DF_Web {
 
 
     private function execute_action($action) {
-        if (!$action) {
-            throw new DF_Web_Exception("No action to execute");
-        }
-        elseif (!is_object($action)) {
-            throw new DF_Web_Exception("Action is not of type DF_Web_Action");
+        if (!$action instanceof DF_Web_Action) {
+            throw new DF_Error_InvalidArgumentException("action", $action, "DF_Web_Action");
         }
         
         // Add the action to the stack
