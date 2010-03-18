@@ -41,6 +41,8 @@ class DF_Web {
     public $stash       = array();
     protected $stack    = array();
 
+    protected $action_classes   = array();
+
     protected $user         = NULL;
     protected $_tried_auth  = false;
 
@@ -322,11 +324,11 @@ class DF_Web {
     }
 
     private function component_prefixed($prefix, $name) {
-        if (NULL == $prefix) {
+        if (!is_string($prefix)) {
             throw new DF_Error_InvalidArgumentException("prefix", $prefix, "string");
         }
 
-        if (NULL == $name) {
+        if (!is_string($name)) {
             throw new DF_Error_InvalidArgumentException("name", $name, "string");
         }
 
@@ -663,67 +665,53 @@ class DF_Web {
     }
 
 
+    public function register_action_class($class) {
+        $obj = new $class();
+        $obj->initialize($this);
+        $name = $obj->get_name();
+        $this->action_classes[$name] = $obj;
+    }
+
+
+    public function ACTION_CLASS($name) {
+        if (!is_string($name)) {
+            throw new DF_Error_InvalidArgumentException('name', $name, 'string');
+        }
+        
+        $handler = NULL;
+        if (isset($this->action_classes[$name])) {
+            $handler = $this->action_classes[$name];
+        }
+        else {
+            throw new DF_Web_Exception("No such action class: $name");
+        }
+
+        $action = $this->stack[count($this->stack)-1];
+        
+        try {
+            return $handler->execute($this, $action);
+        }
+        catch (DF_Web_Exception $ex) {
+            // Dont need the entire stack trace of the component loader
+            throw new DF_Web_Exception($ex->getMessage());
+        }
+    }
+
+
     private function execute_action($action) {
         if (!$action instanceof DF_Web_Action) {
             throw new DF_Error_InvalidArgumentException("action", $action, "DF_Web_Action");
         }
         
         // Add the action to the stack
-        $this->stack[]  = $action;
+        $this->stack[] = $action;
 
-        $ctrl_name      = $action->get_controller();;
-        $method_name    = $action->get_method();
-        $arguments      = $action->get_arguments();
-
-        if ($this->debug)
-        self::$LOGGER->debug("Controller: $ctrl_name, Action: $method_name");
-
-        $controller     = $this->controller($ctrl_name);
-
-        # Prepend the context object to the argumentlist
-        if ($arguments == NULL) {
-            $arguments = array();
-        }
-        array_unshift($arguments, $this);
-
-        if (!method_exists($controller, $method_name)) {
-            $argstr = self::flatten_arguments_list($arguments);
-            throw new DF_Web_Exception("No such method: ${ctrl_name}->${method_name}($argstr)");
-        }
-        # TODO how can I check the PHP access level of a method?
-        #elseif (!is_callable($controller, $method_name)) {
-        #    throw new DF_Web_Exception("Method is not public: $ctrl_name::$method_name");
-        #}
-
-        try {
-            $ret = call_user_func_array(
-                array($controller, $method_name),
-                $arguments
-            );
-            
-            // Removing the last action from the stack after it returns
-            array_pop($this->stack);
-
-            return $ret;
-        }
-        catch (DF_Web_Detach_Exception $ex) {
-            // Rethrow the exception to continue breaking the chain
-            throw $ex;
-        }
-        catch (DF_Web_Exception $ex) {
-            $this->add_error($ex);
-            self::$LOGGER->error("Fatal exception: ".$ex->getMessage());
-        }
-        catch (Exception $ex) {
-            $this->add_error($ex);
-            self::$LOGGER->error("Fatal exception, breaking off chain: ".$ex->getMessage());
-            throw new DF_Web_Detach_Exception(
-                $action,
-                "Got an error we cannot handle"
-            );
-        }
-
-        return false;
+        $ret = $action->execute($this);
+        
+        // Removing the last action from the stack after it returns
+        array_pop($this->stack);
+        
+        return $ret;
     }
 
 
@@ -872,18 +860,14 @@ class DF_Web {
             return;
         }
 
-        if ($template = $this->stash['template']) {
-            $viewname   = $this->config['default_view'];
-            if (isset($this->stash['current_view'])
-                    && $this->stash['current_view']) {
-                $viewname = $this->stash['current_view'];
-            }
-            
-            if (!$viewname) {
-                $err = new DF_Web_Exception("No view selected");
-                $this->add_error($err);
-                return $this->finalize_error();
-            }
+        $viewname   = $this->config['default_view'];
+        if (isset($this->stash['current_view'])
+                && $this->stash['current_view']) {
+            $viewname = $this->stash['current_view'];
+        }
+
+        if ($viewname) {
+            $template = $this->stash['template'];
 
             $this->stash['debug_dump']['stash']     = print_r($this->stash, true);
             $this->stash['debug_dump']['session']   = print_r($this->session, true);
@@ -922,6 +906,14 @@ class DF_Web {
             self::$LOGGER->debug(
                 "No template is set to render."
                 ." Redirecting to $location."
+            );
+            return;
+        }
+        elseif ($this->response->is_error()) {
+            $status = $this->response->status;
+            if ($this->debug)
+            self::$LOGGER->debug(
+                "Sending an error response status $status."
             );
             return;
         }

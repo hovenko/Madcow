@@ -24,8 +24,10 @@ class DF_Web_Component {
     
     /**
      * Called after configuration is set.
+     * 
+     * @param DF_Web $c
      */
-    public function initialize() {
+    public function initialize($c) {
         // does nothing. you should override if you need it
     }
 }

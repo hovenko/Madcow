@@ -45,6 +45,16 @@ class DF_Web_HTTP_Response {
     }
 
 
+    public function is_error() {
+        $status = $this->status;
+        if ($status >= 400) {
+            return true;
+        }
+
+        return false;
+    }
+
+
     public function status($status) {
         if (!is_int($status)) {
             throw new DF_Web_Exception("HTTP status must be an integer");

@@ -70,7 +70,7 @@ class DF_Web_Component_Loader {
 
         $component->config($config);
 
-        $component->initialize();
+        $component->initialize($context);
 
         self::$_components[$name] = $component;
 
