@@ -464,6 +464,7 @@ class DF_Web {
                         $auto_run[$name] = 1;
 
                         $ret = $this->execute_action($autoaction);
+
                         if (!$ret) {
                             throw new DF_Web_Detach_Exception($autoaction, "Returned false from $name/handle_auto");
                         }

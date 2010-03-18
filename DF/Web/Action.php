@@ -72,6 +72,10 @@ class DF_Web_Action {
 
 
     public function execute($c) {
+        if (!$c instanceof DF_Web) {
+            throw new DF_Error_InvalidArgumentException("c", $c, DF_Web);
+        }
+        
         $ctrl_name      = $this->get_controller();;
         $method_name    = $this->get_method();
         $arguments      = $this->get_arguments();
