@@ -71,19 +71,26 @@ class DF_Web_Action {
     }
 
 
-    public function execute($c) {
+    public function dispatch($c) {
         if (!$c instanceof DF_Web) {
             throw new DF_Error_InvalidArgumentException("c", $c, DF_Web);
         }
         
-        $ctrl_name      = $this->get_controller();;
+        return $c->execute_action($this);
+    }
+
+
+    public function execute($controller, $c) {
+        if (!$controller instanceof DF_Web_Controller) {
+            throw new DF_Error_InvalidArgumentException("controller", $controller, DF_Web_Controller);
+        }
+
+        if (!$c instanceof DF_Web) {
+            throw new DF_Error_InvalidArgumentException("c", $c, DF_Web);
+        }
+        
         $method_name    = $this->get_method();
         $arguments      = $this->get_arguments();
-
-        if ($c->is_debug())
-        self::$LOGGER->debug("Controller: $ctrl_name, Action: $method_name");
-
-        $controller     = $c->controller($ctrl_name);
 
         # Prepend the context object to the argumentlist
         if ($arguments == NULL) {

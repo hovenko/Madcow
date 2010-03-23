@@ -4,6 +4,7 @@
  */
 
 
+require_once 'DF/Class/Inspector.php';
 require_once 'DF/Error/InvalidArgumentException.php';
 
 
@@ -32,8 +33,29 @@ class DF_Web_Action_REST extends DF_Web_Action {
     }
 
 
+    /**
+     * Returns a list of HTTP methods allowed for an action.
+     *
+     * @param string $ctrl
+     * @param DF_Web $c
+     * @param string $name name of the action
+     * @return array
+     */
+    static public function get_allowed_methods($ctrl, $c, $name) {
+        $allowed = array();
+        $methods = DF_Class_Inspector::methods($ctrl);
+        foreach ($methods as $method) {
+            if (preg_match("#^$name\_(.+)$#", $method, $m)) {
+                $allowed[] = $m[1];
+            }
+        }
 
-    public function execute($c, $action) {
+        return $allowed;
+    }
+
+
+
+    public function dispatch($c, $action) {
         if (!$c instanceof DF_Web) {
             throw new DF_Error_InvalidArgumentException('c', $c, 'DF_Web');
         }
@@ -49,7 +71,7 @@ class DF_Web_Action_REST extends DF_Web_Action {
         $req            = $c->request;
         $verb           = $req->get_method();
         $verb           = strtoupper($verb);
-        $rest_method    = $method."_$verb";
+        $rest_method    = $method."_".$verb;
 
         $controller     = $c->controller($ctrl_name);
 

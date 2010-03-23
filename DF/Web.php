@@ -463,7 +463,7 @@ class DF_Web {
 
                         $auto_run[$name] = 1;
 
-                        $ret = $this->execute_action($autoaction);
+                        $ret = $autoaction->dispatch($this);
 
                         if (!$ret) {
                             throw new DF_Web_Detach_Exception($autoaction, "Returned false from $name/handle_auto");
@@ -471,7 +471,7 @@ class DF_Web {
                     }
                 }
 
-                $ret = $this->execute_action($action);
+                $ret = $action->dispatch($this);
                 $lastaction = $action;
 
                 if (method_exists($controller, 'handle_end')) {
@@ -504,7 +504,7 @@ class DF_Web {
             );
 
             try {
-                $this->execute_action($action_err);
+                $action_err->dispatch($this);
                 $lastaction = $action_err;
             }
             catch (DF_Web_Exception $inner_ex) {
@@ -522,7 +522,7 @@ class DF_Web {
 
             try {
                 self::$LOGGER->debug("Executing end action controller: ".$endaction->get_controller());
-                $this->execute_action($endaction);
+                $endaction->dispatch($this);
             }
             catch (DF_Web_Exception $ex) {
                 self::$LOGGER->error("Failed executing action: ".$ex->getMessage());
@@ -533,7 +533,7 @@ class DF_Web {
                     array($ex)
                 );
 
-                $this->execute_action($action_err);
+                $action_err->dispatch($this);
                 $lastaction = $action_err;
             }
         }
@@ -563,7 +563,7 @@ class DF_Web {
      */
     public function forward($command, $args = NULL, $args2 = NULL) {
         $action = $this->buildAction($command, $args, $args2);
-        return $this->execute_action($action);
+        return $action->dispatch($this);
     }
 
 
@@ -584,8 +584,8 @@ class DF_Web {
         $action = NULL;
         
         if ($command !== NULL) {
-           !$action = $this->buildAction($command, $args, $args2);
-            $ret    = $this->execute_action($action);
+            $action = $this->buildAction($command, $args, $args2);
+            $ret    = $action->dispatch($this);
         }
         else {
             $action = $this->get_current_action();
@@ -689,25 +689,22 @@ class DF_Web {
 
         $action = $this->stack[count($this->stack)-1];
         
-        try {
-            return $handler->execute($this, $action);
-        }
-        catch (DF_Web_Exception $ex) {
-            // Dont need the entire stack trace of the component loader
-            throw new DF_Web_Exception($ex->getMessage());
-        }
+        return $handler->dispatch($this, $action);
     }
 
 
-    private function execute_action($action) {
+    public function execute_action($action) {
         if (!$action instanceof DF_Web_Action) {
             throw new DF_Error_InvalidArgumentException("action", $action, "DF_Web_Action");
         }
+
+        $class  = $action->get_controller();
+        $controller = $this->controller($class);
         
         // Add the action to the stack
         $this->stack[] = $action;
 
-        $ret = $action->execute($this);
+        $ret = $action->execute($controller, $this);
         
         // Removing the last action from the stack after it returns
         array_pop($this->stack);

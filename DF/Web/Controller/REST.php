@@ -14,19 +14,5 @@ class DF_Web_Controller_REST extends DF_Web_Controller {
         $c->register_action_class(DF_Web_Action_REST);
     }
 
-#    public function handle_auto($c) {
-#        // Override if you like
-#    }
-#
-#    public function handle_index($c) {
-#        // Override if you like
-#    }
-#
-#    public function handle_begin($c) {
-#        // Override if you like
-#    }
 
-    public function handle_end($c) {
-        $this->stash['current_view'] = '';
-    }
 }
