@@ -136,6 +136,7 @@ class DF_Web {
     }
 
 
+    // FIXME cannot be here
     private function setup_defaults() {
         $this->stash['site']['title']   = $this->config['title'];
 
@@ -540,14 +541,20 @@ class DF_Web {
 
         # Autodetect template only if not redirecting?
         if (!isset($this->stash['template']) && !$this->response->redirect()) {
-            $template = sprintf(
-                '%s/%s.tpl',
-                strtolower($lastaction->get_controller()),
-                preg_replace('|^handle_(.+)$|', '$1', $lastaction->get_method())
-            );
-
+            $template = self::template_from_action($lastaction);
             $this->stash['template'] = $template;
         }
+    }
+
+
+    static protected function template_from_action($action) {
+        $template = sprintf(
+            '%s/%s.tpl',
+            strtolower($action->get_controller()),
+            preg_replace('|^handle_(.+)$|', '$1', $action->get_method())
+        );
+
+        return $template;
     }
 
 
@@ -864,42 +871,7 @@ class DF_Web {
             $viewname = $this->stash['current_view'];
         }
 
-        if ($viewname) {
-            $template = $this->stash['template'];
-
-            $this->stash['debug_dump']['stash']     = print_r($this->stash, true);
-            $this->stash['debug_dump']['session']   = print_r($this->session, true);
-
-            // Stashing session
-            $this->stash['session'] = $this->session;
-
-            // Setting context object
-            $this->stash['c'] = $this;
-
-            $view = $this->view($viewname);
-
-            foreach ($this->stash as $key => $value) {
-                $view->assign($key, $value);
-            }
-
-            $view->assign('javascripts', $response->get_javascripts());
-            $view->assign('stylesheets', $response->get_stylesheets());
-
-            $execution_time = $this->get_execution_time();
-            $view->assign('execution_time', $execution_time);
-            $view->assign('memory', $this->get_memory_usage());
-            $view->assign('server', $this->get_server_info());
-
-            $view->set_template($template);
-
-            $response->body = $view->render();
-
-            if ($view->isError()) {
-                $this->response->status(500);
-                self::$LOGGER->error("Error rendering template: $template");
-            }
-        }
-        elseif ($location = $this->response->redirect()) {
+        if ($location = $this->response->redirect()) {
             if ($this->debug)
             self::$LOGGER->debug(
                 "No template is set to render."
@@ -914,6 +886,44 @@ class DF_Web {
                 "Sending an error response status $status."
             );
             return;
+        }
+        elseif ($viewname) {
+            if ($this->debug)
+            self::$LOGGER->debug("View handler: $viewname");
+
+            $template = $this->stash['template'];
+
+            $this->stash['debug_dump']['stash']     = print_r($this->stash, true);
+            $this->stash['debug_dump']['session']   = print_r($this->session, true);
+
+            // Stashing session
+            $this->stash['session'] = $this->session;
+
+            $this->stash['javascripts'] = $response->get_javascripts();
+            $this->stash['stylesheets'] = $response->get_stylesheets();
+
+            // Setting context object
+            $this->stash['c'] = $this;
+
+            $view = $this->view($viewname);
+
+            foreach ($this->stash as $key => $value) {
+                $view->assign($key, $value);
+            }
+
+            $execution_time = $this->get_execution_time();
+            $view->assign('execution_time', $execution_time);
+            $view->assign('memory', $this->get_memory_usage());
+            $view->assign('server', $this->get_server_info());
+
+            $view->set_template($template);
+
+            $response->body = $view->render();
+
+            if ($view->isError()) {
+                $this->response->status(500);
+                self::$LOGGER->error("Error rendering template: $template");
+            }
         }
         else {
             throw new DF_Web_Exception("No template to render");
