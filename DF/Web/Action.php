@@ -46,7 +46,10 @@ class DF_Web_Action {
             throw new DF_Error_InvalidArgumentException('method', $method, 'string');
         }
 
-        if ($args && !is_array($args)) {
+        if (NULL === $args) {
+            // ok
+        }
+        elseif (!is_array($args)) {
             throw new DF_Error_InvalidArgumentException('args', $args, 'array');
         }
     
@@ -166,11 +169,19 @@ class DF_Web_Action {
 
 
     public function toString() {
-        $args = DF_Web_Utils_Arguments::flatten_arguments_list($this->arguments);
+        $args = "";
+        if ($this->arguments) {
+            $args = DF_Web_Utils_Arguments::flatten_arguments_list($this->arguments);
+        }
         $ctrl   = $this->controller;
         $method = $this->method;
 
         return "{$ctrl}->{$method}({$args})";
+    }
+
+
+    public function __toString() {
+        return $this->toString();
     }
 }
 
