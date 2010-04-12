@@ -30,11 +30,10 @@ class DF_Web_Routing {
         $controllers    = self::controller_configs($config);
         $paths          = self::resolve_controller_paths($controllers);
         $actions        = self::resolve_actions($paths);
+        $chained        = self::resolve_chained_actions($actions);
+
         $this->actions = $actions;
-        #print_r($paths);
-        #print_r($actions);
-        $this->chained = self::resolve_chained_actions($actions);
-        #print_r($this->chained);
+        $this->chained = $chained;
     }
 
 
@@ -191,7 +190,7 @@ class DF_Web_Routing {
                 $best = $match;
             }
             else {
-                self::$LOGGER->debug("Not matched $path -> $match - $reason");
+                #self::$LOGGER->debug("Not matched $path -> $match - $reason");
             }
         }
 
@@ -229,7 +228,7 @@ class DF_Web_Routing {
                     $best = $match;
                 }
                 else {
-                    self::$LOGGER->debug("Not matched $path -> $match - $reason");
+                    #self::$LOGGER->debug("Not matched $path -> $match - $reason");
                 }
             }
         }
@@ -494,48 +493,6 @@ class DF_Web_Routing {
         }
 
         return $ret;
-    }
-
-
-    private function parse_partconfigs($ezcUrl, $partconfig) {
-        $actions = array();
-        $next_cfgs = array();
-
-        if (isset($partconfig['actions'])
-                && is_array($partconfig['actions'])) {
-            foreach ($partconfig['actions'] as $action_cfg) {
-                $action = $this->assemble_action($ezcUrl, $action_cfg);
-
-                $actions[] = $action;
-            }
-        }
-
-        if (isset($partconfig['config'])) {
-            $next_cfgs[] = $partconfig['config'];
-        }
-
-        return array(
-            'next'      => $next_cfgs,
-            'actions'   => $actions,
-        );
-    }
-
-
-    public function assemble_action($ezcUrl, $action_cfg) {
-        $action_cfg = $this->sanitize_action_configuration($action_cfg);
-
-        $action_cfg['arguments'] = $this->lookup_arguments(
-            $ezcUrl,
-            $action_cfg['argument_params']
-        );
-
-        $action = new DF_Web_Action(
-            $action_cfg['controller'],
-            $action_cfg['method'],
-            $action_cfg['arguments']
-        );
-
-        return $action;
     }
 
 
