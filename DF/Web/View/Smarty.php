@@ -60,6 +60,10 @@ class DF_Web_View_Smarty extends DF_Web_View {
 
 
     public function set_template($template) {
+        if (!is_string($template)) {
+            throw new DF_Error_InvalidArgumentException('template', $template, 'string');
+        }
+
         $this->template = $template;
     }
 
@@ -74,6 +78,10 @@ class DF_Web_View_Smarty extends DF_Web_View {
         $smarty     = $this->getSmarty();
         $template   = $this->template;
         $output     = '';
+
+        if (!$template) {
+            throw new DF_Web_Exception("Missing template to render");
+        }
 
         if (!is_file($smarty->template_dir."/$template")) {
             $smarty->assign('error', "Template does not exist: $template");
