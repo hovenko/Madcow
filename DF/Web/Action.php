@@ -168,6 +168,26 @@ class DF_Web_Action {
     }
 
 
+    public function get_private_path() {
+        $controller_path    = $this->get_controller_private_path();
+        $method_path        = $this->get_method_private_path();
+        return "$controller_path/$method_path";
+    }
+
+
+    protected function get_method_private_path() {
+        $path = preg_replace('|^handle_(.+)$|', '$1', $this->get_method());
+        return $path;
+    }
+
+
+    protected function get_controller_private_path() {
+        $path = strtolower($this->get_controller());
+        $path = preg_replace('#_#', '/', $path);
+        return $path;
+    }
+
+
     public function toString() {
         $args = "";
         if ($this->arguments) {

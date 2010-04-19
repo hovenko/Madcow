@@ -548,10 +548,13 @@ class DF_Web {
 
 
     static protected function template_from_action($action) {
+        if (!$action instanceof DF_Web_Action) {
+            throw new DF_Error_InvalidArgumentException('action', $action, DF_Web_Action);
+        }
+        
         $template = sprintf(
-            '%s/%s.tpl',
-            strtolower($action->get_controller()),
-            preg_replace('|^handle_(.+)$|', '$1', $action->get_method())
+            '%s.tpl',
+            $action->get_private_path()
         );
 
         return $template;
