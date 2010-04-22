@@ -11,7 +11,7 @@ if (!$name) {
 $nice   = strtolower($name);
 
 if (!preg_match('|^[a-z][\w\d_]*$|', $nice)) {
-    die("Not a valid name, only a-z0-9 are allowed: $name ($nice)\n");
+    die("Not a valid name, only a-z0-9_ are allowed: $name ($nice)\n");
 }
 if (is_dir($nice)) {
     die("A directory exists by that name: $nice\n");
