@@ -41,6 +41,7 @@ class DF_Web_View_Smarty extends DF_Web_View {
      */
     public function initialize() {
         $config = $this->config();
+
         $smarty = new Smarty();
 
         $env        = DF_Web_Environment::singleton();
@@ -49,7 +50,31 @@ class DF_Web_View_Smarty extends DF_Web_View {
         $smarty->template_dir   = "$app_root/templates";
         $smarty->compile_dir    = "$app_root/templates_c";
         $smarty->cache_dir      = "$app_root/smarty/cache";
-        $smarty->plugins_dir[]  = "$app_root/smarty/plugins";
+
+        if ($tmp = $config['templates_dir']) {
+            $smarty->templates_dir  = $tmp;
+        }
+
+        if ($tmp = $config['compile_dir']) {
+            $smarty->compile_dir    = $tmp;
+        }
+
+        if ($tmp = $config['cache_dir']) {
+            $smarty->cache_dir    = $tmp;
+        }
+
+        if ($tmp = $config['plugins_dir']) {
+            if (!is_array($tmp)) {
+                $tmp = array($tmp);
+            }
+
+            foreach ($tmp as $dir) {
+                $smarty->plugins_dir[]  = $dir;
+            }
+        }
+        else {
+            $smarty->plugins_dir[]  = "$app_root/smarty/plugins";
+        }
 
         $smarty->debugging      = $config['debugging'];
         $smarty->debugging_ctrl = $config['debugging_ctrl'];
