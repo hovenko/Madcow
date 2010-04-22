@@ -137,7 +137,7 @@ class DF_Web {
 
 
     // FIXME cannot be here
-    private function setup_defaults() {
+    protected function setup_defaults() {
         $this->stash['site']['title']   = $this->config['title'];
 
         $this->response->add_stylesheet(
