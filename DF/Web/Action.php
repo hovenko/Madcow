@@ -103,6 +103,7 @@ class DF_Web_Action {
 
         if (!method_exists($controller, $method_name)) {
             $argstr = DF_Web_Utils_Arguments::flatten_arguments_list($arguments);
+            $ctrl_name = get_class($controller);
             throw new DF_Web_Exception("No such method: ${ctrl_name}->${method_name}($argstr)");
         }
         # TODO how can I check the PHP access level of a method?
