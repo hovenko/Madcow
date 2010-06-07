@@ -856,7 +856,7 @@ class DF_Web {
     }
 
 
-    public function render_body() {
+    protected function render_body() {
         $response = $this->response;
 
         if ($response->body) {
@@ -877,19 +877,18 @@ class DF_Web {
         if ($location = $this->response->redirect()) {
             if ($this->debug)
             self::$LOGGER->debug(
-                "No template is set to render."
-                ." Redirecting to $location."
+                "Redirecting to $location."
             );
             return;
         }
-        elseif ($this->response->is_error()) {
-            $status = $this->response->status;
-            if ($this->debug)
-            self::$LOGGER->debug(
-                "Sending an error response status $status."
-            );
-            return;
-        }
+        #elseif ($this->response->is_error()) {
+        #    $status = $this->response->status;
+        #    if ($this->debug)
+        #    self::$LOGGER->debug(
+        #        "Sending an error response status $status."
+        #    );
+        #    return;
+        #}
         elseif ($viewname) {
             if ($this->debug)
             self::$LOGGER->debug("View handler: $viewname");
