@@ -2,11 +2,11 @@
 
 
 require_once 'DF/Web/Action.php';
+require_once 'DF/Web/Component/Name.php';
 require_once 'DF/Web/Exception.php';
 require_once 'DF/Web/Routing/ActionFactory.php';
 require_once 'DF/Web/Routing/ActionMatch.php';
 require_once 'DF/Web/Routing/Action/PathMismatchException.php';
-require_once 'DF/Web/Routing/Component/Name.php';
 require_once 'DF/Web/Routing/Config/Controller.php';
 require_once 'DF/Web/URL.php';
 
@@ -29,11 +29,17 @@ class DF_Web_Routing {
         $config = $this->config;
         $controllers    = self::controller_configs($config);
         $paths          = self::resolve_controller_paths($controllers);
-        $actions        = self::resolve_actions($paths);
-        $chained        = self::resolve_chained_actions($actions);
 
-        $this->actions = $actions;
-        $this->chained = $chained;
+        $actions        = self::resolve_actions($paths);
+        $this->actions  = $actions;
+
+        #error_log("Available actions:");
+        #foreach ($actions as $name => $action) {
+        #    error_log("    $name => ".$action);
+        #}
+
+        $chained        = self::resolve_chained_actions($actions);
+        $this->chained  = $chained;
     }
 
 
@@ -49,7 +55,7 @@ class DF_Web_Routing {
                 continue;
             }
 
-            $chain = array();
+            $chain = new DF_Web_Routing_ActionChain($action);
 
             $more = true;
 
@@ -58,8 +64,6 @@ class DF_Web_Routing {
             $path       = NULL;
 
             while ($more) {
-                $chain[] = $chained;
-
                 if ($path && "$path") {
                     $path   = $chained->get_path_match()->append_path($path);
                 }
@@ -83,6 +87,7 @@ class DF_Web_Routing {
                             throw new DF_Web_Exception("Action not chained: $chainpath ($nextpath)");
                         }
 
+                        $chain->add_to_chain($chained);
                         $nextpath = "$chainpath";
                     }
                     else {
@@ -91,13 +96,8 @@ class DF_Web_Routing {
                 }
             }
 
-            #if (!$path->is_absolute()) {
-                $rootpath = DF_Web_Path::fromString("/");
-                $path = $rootpath->append_path($path);
-            #}
-
-            $chain = array_reverse($chain);
-            $resolved["$path"][] = $chain;
+            #error_log("Chain $action:\n".$chain->toDebugString());
+            $resolved[] = $chain;
         }
 
         return $resolved;
@@ -107,13 +107,14 @@ class DF_Web_Routing {
     static protected function resolve_actions($controllers) {
         $actions = array();
 
-        foreach ($controllers as $path => $ctrl) {
-            foreach ($tmp = $ctrl->get_actions() as $action_cfg) {
+        foreach ($controllers as $ctrl) {
+            $path = $ctrl->get_path();
+            foreach ($_ = $ctrl->get_actions() as $action_cfg) {
                 $action = DF_Web_Routing_ActionFactory::resolve($action_cfg);
 
                 $action_name = $action->get_name();
                 $private_path = "/$action_name";
-                if ($path) {
+                if ("$path") {
                     $private_path = "/$path$private_path";
                 }
                 
@@ -137,7 +138,7 @@ class DF_Web_Routing {
         foreach ($config as $key => $value) {
             if (preg_match('#^Controller_(.*)#', $key, $matches)) {
                 $name = $matches[1];
-                $name = new DF_Web_Routing_Component_Name($name);
+                $name = new DF_Web_Component_Name($name);
                 $ctrl = new DF_Web_Routing_Config_Controller($name, $value);
                 $controller_configs["$name"] = $ctrl;
             }
@@ -160,76 +161,80 @@ class DF_Web_Routing {
             $paths["$path"] = $controller;
         }
 
-        return $paths;
+        return array_values($paths);
     }
 
 
     protected function find_path_actions_by_path($path) {
-        $best = NULL;
+        #$best = NULL;
     
-        foreach ($this->actions as $actionpath => $action) {
-            if (!$action instanceof DF_Web_Routing_Action_Path) {
-                continue;
-            }
+        #foreach ($this->actions as $actionpath => $action) {
+        #    if (!$action instanceof DF_Web_Routing_Action_Path) {
+        #        continue;
+        #    }
 
-            $actionpath = $action->get_path();
-            $reason = "";
+        #    $actionpath = $action->get_path();
+        #    $reason = "";
 
-            $score = -1;
-            try {
-                $score = self::path_match($path, $actionpath, $action);
-            }
-            catch (DF_Web_Routing_Action_PathMismatchException $e) {
-                $reason = $e->getMessage();
-                # path not matched
-                $score = -1;
-            }
+        #    $score = -1;
+        #    try {
+        #        $score = self::path_match($path, $actionpath, $action);
+        #    }
+        #    catch (DF_Web_Routing_Action_PathMismatchException $e) {
+        #        $reason = $e->getMessage();
+        #        # path not matched
+        #        $score = -1;
+        #    }
 
-            $match = new DF_Web_Routing_ActionMatch($score, $actionpath, array($action));
-            if ($match->is_better_than($best)) {
-                $best = $match;
-            }
-            else {
-                #self::$LOGGER->debug("Not matched $path -> $match - $reason");
-            }
-        }
+        #    $match = new DF_Web_Routing_ActionMatch($score, $actionpath, array($action));
+        #    if ($match->is_better_than($best)) {
+        #        $best = $match;
+        #    }
+        #    else {
+        #        self::$LOGGER->debug("Not matched $path -> $match - $reason");
+        #    }
+        #}
 
-        if ($best) {
-            self::$LOGGER->info("Matched $path -> $best");
-        }
-        else {
-            self::$LOGGER->warn("Not matched $path");
-        }
+        #if ($best) {
+        #    self::$LOGGER->info("Matched $path -> $best");
+        #}
+        #else {
+        #    self::$LOGGER->warn("Not matched $path");
+        #}
 
-        return $best;
+        #return $best;
     }
 
 
     protected function find_chained_actions_by_path($path) {
+        if (!$path instanceof DF_Web_Path) {
+            throw new DF_Error_InvalidArgumentException("path", $path, "DF_Web_Path");
+        }
+
         $best = NULL;
+        $any = true;
     
-        foreach ($this->chained as $actionpath => $chained) {
-            foreach ($chained as $actions) {
-                $actionpath = DF_Web_Path::fromString("$actionpath");
-                $reason = "";
+        foreach ($this->chained as $chain) {
+            $actions    = $chain->get_chain_list();
+            $action     = $chain->get_endpoint();
+            $actionpath = $action->get_path_match();
+            $reason = "";
 
-                $score = -1;
-                try {
-                    $score = self::chained_match($path, $actionpath, $actions);
-                }
-                catch (DF_Web_Routing_Action_PathMismatchException $e) {
-                    $reason = $e->getMessage();
-                    # path not matched
-                    $score = -1;
-                }
+            $score = -1;
+            try {
+                $score = self::chained_match($path, $chain);
+            }
+            catch (DF_Web_Routing_Action_PathMismatchException $e) {
+                # path not matched
+                $reason = $e->getMessage();
+            }
 
-                $match = new DF_Web_Routing_ActionMatch($score, $actionpath, $actions);
-                if ($match->is_better_than($best)) {
-                    $best = $match;
-                }
-                else {
-                    #self::$LOGGER->debug("Not matched $path -> $match - $reason");
-                }
+            $match = new DF_Web_Routing_ActionMatch($score, $actionpath, $actions);
+            if ($match->is_better_than($best)) {
+                $best = $match;
+            }
+            else {
+                self::$LOGGER->debug("Not matched $path -> $actionpath ($reason) :: $match");
             }
         }
 
@@ -244,32 +249,36 @@ class DF_Web_Routing {
     }
 
 
-    static protected function path_match($path, $a_path, $action) {
-        $a_parts    = $a_path->get_path_parts();
-        $a_numparts = count($a_parts);
+#    static protected function path_match($path, $a_path, $action) {
+#        $a_parts    = $a_path->get_path_parts();
+#        $a_numparts = count($a_parts);
+#
+#        $parts      = $path->get_path_parts();
+#        $numparts   = count($parts);
+#
+#        if ($numparts < $a_numparts) {
+#            return -1;
+#        }
+#        
+#        $tmp_parts = $action->get_path()->get_path_parts();
+#        if (count($parts) < $tmp_parts->get_numparts) {
+#            $c_rest     = count($rest);
+#            $c_a_parts  = $tmp_parts->get_numparts();
+#            throw new DF_Web_Routing_Action_PathMismatchException("Not enough parts for $a_path to eat ($c_rest < $c_a_parts): $path");
+#            return -1;
+#        }
+#
+#        $parts = self::eat_path_parts($action, $parts);
+#
+#        return count($parts);
+#    }
 
-        $parts      = $path->get_path_parts();
-        $numparts   = count($parts);
 
-        if ($numparts < $a_numparts) {
-            return -1;
-        }
-        
-        $tmp_parts = $action->get_path()->get_path_parts();
-        if (count($parts) < count($tmp_parts)) {
-            $c_rest     = count($rest);
-            $c_a_parts  = $tmp_parts->get_numparts();
-            throw new DF_Web_Routing_Action_PathMismatchException("Not enough parts for $a_path to eat ($c_rest < $c_a_parts): $path");
-            return -1;
-        }
+    static protected function chained_match($path, $chain) {
+        $action     = $chain->get_endpoint();
+        $a_path     = $action->get_path_match();
+        $a_args     = $action->get_args();
 
-        $parts = self::eat_path_parts($action, $parts);
-
-        return count($parts);
-    }
-
-
-    static protected function chained_match($path, $a_path, $actions) {
         $a_parts    = $a_path->get_path_parts();
         $a_numparts = count($a_parts);
 
@@ -282,27 +291,29 @@ class DF_Web_Routing {
 
         $rest = $parts;
 
-        foreach ($actions as $action) {
-            $tmp_parts  = $action->get_path()->get_path_parts();
-            $c_rest     = count($rest);
-            if ($c_rest < $tmp_parts->get_numparts) {
-                $c_a_parts  = $tmp_parts->get_numparts();
-                throw new DF_Web_Routing_Action_PathMismatchException("Not enough parts for $a_path to eat ($c_rest < $c_a_parts): $path");
-            }
-
-            $rest = self::eat_path_parts($action, $rest);
+        # FIXME For chains, dont do this for normal path actions
+        foreach ($chain->get_chain_list() as $_a) {
+            $rest = self::eat_path_parts($_a, $rest);
         }
 
-        return count($rest);
+        $count = count($rest);
+
+        if ($a_args instanceof DF_Web_Routing_ActionArgs_Any) {
+            $count += 1000;
+        }
+
+        return $count;
     }
 
 
     static protected function eat_path_parts($action, $parts) {
-        $a_path     = $action->get_path();
+        $args       = $action->get_args();
+        $a_path     = $action->get_path_match();
         $a_parts    = $a_path->get_path_parts();
 
         foreach ($a_parts as $tmp) {
             if ($tmp == '**') {
+                // Match any
                 return $parts;
             }
 
@@ -316,9 +327,8 @@ class DF_Web_Routing {
             }
         }
 
-        self::$LOGGER->debug("Action: $action");
+        #self::$LOGGER->debug("Action: $action");
 
-        $args = $action->get_args();
         if (NULL === $args) {
             return $parts;
         }
@@ -328,14 +338,14 @@ class DF_Web_Routing {
         }
 
         # Got args, need to match it all
-        $numargs = $args->get_numargs();
-        for ($i = $numargs; $i > 0; $i--) {
-            if (!$parts) {
-                throw new DF_Web_Routing_Action_PathMismatchException("Not enough path parts to match $a_path. Missing $i args");
-            }
-        
-            $part = array_shift($parts);
-        }
+        #$numargs = $args->get_numargs();
+        #for ($i = $numargs; $i > 0; $i--) {
+        #    if (!$parts) {
+        #        throw new DF_Web_Routing_Action_PathMismatchException("Not enough path parts to match $a_path. Missing $i args");
+        #    }
+        #
+        #    $part = array_shift($parts);
+        #}
 
         if ($count = count($parts)) {
             throw new DF_Web_Routing_Action_PathMismatchException("Too many path parts to match $a_path. Unmatched: $count");
@@ -513,4 +523,8 @@ class DF_Web_Routing {
 
 }
 
+require_once 'DF/Error/InvalidArgumentException.php';
+require_once 'DF/Web/Routing/ActionChain.php';
+
 DF_Web_Routing::$LOGGER = DF_Web_Logger::logger('DF_Web_Routing');
+
