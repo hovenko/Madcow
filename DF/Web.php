@@ -79,6 +79,14 @@ class DF_Web {
     }
 
 
+    /**
+     * Returns true if debugging is enabled, false if not.
+     * 
+     * This is controlled from the environment setup
+     * in {@see setup_environment()}
+     *
+     * @return boolean
+     */
     public function is_debug() {
         return $this->debug;
     }
@@ -91,8 +99,13 @@ class DF_Web {
         );
     }
 
+
+    /**
+     * The default error handler of Madcow.
+     *
+     * It logs all messages as warnings using the default logger.
+     */
     public function default_error_handler($errno, $errstr, $errfile, $errline) {
-        #throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
         self::$LOGGER->warn("$errstr $errno $errfile $errline");
     }
 
@@ -123,7 +136,11 @@ class DF_Web {
     }
 
 
-
+    /**
+     * Use to enable or disable debugging.
+     *
+     * @param boolean $bool
+     */
     public function set_debug($bool) {
         $bool = $bool ? TRUE : FALSE;
         $this->debug            = $bool;
@@ -131,6 +148,13 @@ class DF_Web {
     }
 
 
+    /**
+     * Same as is_debug()
+     *
+     * @see is_debug()
+     * @deprecated use is_debug() instead
+     * @return boolean
+     */
     public function debug() {
         return $this->debug;
     }
@@ -156,6 +180,30 @@ class DF_Web {
         );
     }
 
+
+    /**
+     * Use to build URLs for the web site of the current context.
+     * It will prepend the base path of the web site automatically
+     * together with the domain name.
+     *
+     * It takes a flexible number of parameters.
+     * The first parameter should be a path,
+     * absolute to the web root or relative to the current request.
+     *
+     * Any number of path arguments can be given, where all paths will be
+     * joined together separated with slash (/).
+     *
+     * The last argument can optionally be an array of query parameters,
+     * a map of param name and value.
+     * 
+     * Examples of possible arguments:
+     *  - "/"
+     *  - "some_other_actions"
+     *  - "/some_action", array("key" => "value")
+     *  - array("key" => "value")
+     *
+     * @return string
+     */
     public function uri_for() {
         $base_path = $this->base_path;
         $hostname  = $this->request->hostname;
@@ -183,6 +231,9 @@ class DF_Web {
                 $arg = urlencode($arg);
                 $path .= '/'.$arg;
             }
+        }
+        else {
+            $path = "";
         }
 
         $query_arr = array();
@@ -226,7 +277,20 @@ class DF_Web {
     }
 
 
-    public function component($class) {
+    /**
+     * Loads a component by class name.
+     * 
+     * If the component class has a method named "ACCEPT_CONTEXT"
+     * that method will be invoked on the object instance
+     * after the component is initialized.
+     * The context object (instance of this class) will be passed in as
+     * an argument to ACCEPT_CONTEXT.
+     *
+     * @see DF_Web_Component_Loader for component initialization
+     * @param string $class
+     * @return DF_Web_Component
+     */
+    protected function component($class) {
         if (!is_string($class)) {
             throw new DF_Error_InvalidArgumentException("class", $class, "string");
         }
@@ -258,6 +322,11 @@ class DF_Web {
     }
 
 
+    /**
+     * Returns the class name of the context.
+     *
+     * @return string
+     */
     public function get_context_class() {
         $classname = get_class($this);
         return $classname;
@@ -324,6 +393,7 @@ class DF_Web {
         }
     }
 
+
     private function component_prefixed($prefix, $name) {
         if (!is_string($prefix)) {
             throw new DF_Error_InvalidArgumentException("prefix", $prefix, "string");
@@ -344,7 +414,7 @@ class DF_Web {
     }
 
 
-    public function split_uri($uri) {
+    static public function split_uri($uri) {
         if (!preg_match('|^(\w+):(.*)|', $uri, $matches)) {
             self::$LOGGER->warning("Not a valid URI: $uri");
             return;
@@ -362,7 +432,7 @@ class DF_Web {
 
 
     public function resolve_uri($uri) {
-        $parts = $this->split_uri($uri);
+        $parts = self::split_uri($uri);
 
         $schema = $parts['schema'];
         $rest   = $parts['rest'];
@@ -382,7 +452,7 @@ class DF_Web {
 
 
     protected function resolve_uri_local($uri) {
-        $parts = $this->split_uri($uri);
+        $parts = self::split_uri($uri);
 
         $schema = $parts['schema'];
         $rest   = $parts['rest'];
@@ -415,7 +485,7 @@ class DF_Web {
     }
 
 
-    public function resolve_madcow_uri($uri) {
+    private function resolve_madcow_uri($uri) {
         preg_match('|^(\w+):(.*)|', $uri, $matches);
         $schema = $matches[1];
         $rest   = $matches[2];
@@ -547,6 +617,13 @@ class DF_Web {
     }
 
 
+    /**
+     * Returns an autodetected path to a template based on
+     * the private path of the given action.
+     *
+     * @param DF_Web_Action $action
+     * @return string
+     */
     static protected function template_from_action($action) {
         if (!$action instanceof DF_Web_Action) {
             throw new DF_Error_InvalidArgumentException('action', $action, DF_Web_Action);
@@ -665,11 +742,6 @@ class DF_Web {
     }
 
 
-    static protected function flatten_arguments_list($arguments) {
-        return DF_Web_Utils_Arguments::flatten_arguments_list($arguments);
-    }
-
-
     protected function get_current_action() {
         $action = $this->stack[count($this->stack)-1];
         return $action;
@@ -725,6 +797,7 @@ class DF_Web {
 
     public function setup_base_path($path = NULL) {
         if ($path) {
+            # FIXME is this ever called? do we need it or should we always depend on the environment?
             $this->base_path = $path;
         }
         else {
@@ -734,10 +807,14 @@ class DF_Web {
     }
 
 
+    /**
+     * Adds an error/exception to the errors stack.
+     *
+     * @param Exception $exception
+     */
     public function add_error($exception) {
         if (!$exception instanceof Exception) {
-            $type = gettype($exception);
-            throw new InvalidArgumentException("Not an exception. Was: $type");
+            throw new DF_Error_InvalidArgumentException("exception", $exception, Exception);
         }
         
         $this->errors[] = $exception;
@@ -775,24 +852,27 @@ class DF_Web {
     }
 
 
+    # TODO move to an HTTP Engine Request Factory
     private function setup_request() {
         $env        = DF_Web_Environment::singleton();
         $request    = new DF_Web_HTTP_Request();
+
+        $base_path  = $this->base_path;
 
         $req_path   = $_SERVER['REQUEST_URI'];
         $req_method = $_SERVER['REQUEST_METHOD'];
         $hostname   = $_SERVER['HTTP_HOST'];
         $port       = $_SERVER['SERVER_PORT'];
 
-        if ($req_path && !DF_Web_HTTP_Path::has_base_path($req_path, $this->base_path)) {
+        if ($req_path && !DF_Web_HTTP_Path::has_base_path($req_path, $base_path)) {
             throw new DF_Web_Exception("Requested path does not contain base path: $req_path");
         }
 
-        $req_path   = DF_Web_HTTP_Path::strip_base_path($req_path, $this->base_path);
+        $req_path   = DF_Web_HTTP_Path::strip_base_path($req_path, $base_path);
         $req_path   = DF_Web_HTTP_Path::strip_query_params($req_path);
 
         $request->set_path($req_path);
-        $request->set_base_path($this->base_path);
+        $request->set_base_path($base_path);
 
         list($path, $_jimbo) = DF_Web_HTTP_Path::split_params($req_path);
         $arguments  = DF_Web_HTTP_Path::split_parts($path);
@@ -825,7 +905,7 @@ class DF_Web {
 
         
         $proxies    = $env->trusted_proxies;
-        $ipAddress  = $this->extract_client_address($proxies - 1);
+        $ipAddress  = self::extract_client_address($proxies - 1);
         $request->set_address($ipAddress);
 
         # TODO how do we figure this out? probably not needed anyway
@@ -840,7 +920,7 @@ class DF_Web {
     }
 
 
-    private function extract_client_address($proxied_idx = 0) {
+    static private function extract_client_address($proxied_idx = 0) {
         if (empty($_SERVER["HTTP_X_FORWARDED_FOR"])) {
             $ip_address = $_SERVER["REMOTE_ADDR"];
         }
@@ -1090,6 +1170,10 @@ EOHTML;
         $error      = $this->errors[0];
         $class      = get_class($error);
         $message    = $error->getMessage();
+        if ($error instanceof NRK_Exception) {
+            $message    = $error->getNestedMessage();
+        }
+
         $stacktrace = $error->getTraceAsString();
         self::$LOGGER->error("Caught an error ($class): $message");
         self::$LOGGER->debug("Stack trace: $stacktrace");
