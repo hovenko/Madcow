@@ -60,7 +60,27 @@ class DF_Web_Routing_Action_Chained
 
     public function get_path_match() {
         if ($this->is_endpoint()) {
-            return parent::get_path_match();
+            $stars = array();
+            $args = $this->args;
+            if ($args instanceof DF_Web_Routing_ActionArgs_Any) {
+                $stars[] = "**";
+            }
+            else {
+                for ($i=0; $i<$args->get_numargs(); $i++) {
+                    $stars[] = "*";
+                }
+            }
+    
+            $argspath = join("/", $stars);
+    
+            $path = $this->get_path();
+    
+            if ($argspath) {
+                $path = $path->append_path(DF_Web_Path::fromString($argspath));
+            }
+    
+            return $path;
+    
         }
         
         return $this->get_path();
