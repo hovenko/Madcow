@@ -30,7 +30,7 @@ class DF_Web_Component_Loader {
     }
 
     public static function component($name, $context) {
-        $base = "DF_Web";
+        $base = NULL;
 
         if (NULL === $context) {
             throw new DF_Web_Exception("A context object must be given");
@@ -38,12 +38,11 @@ class DF_Web_Component_Loader {
         elseif (is_string($context)) {
             $base = $context;
         }
-        elseif ($context instanceof DF_Web) {
-            $base = $context->get_context_class();
+        elseif (!$context instanceof DF_Web) {
+            throw new DF_Error_InvalidArgumentException("context", $context, DF_Web);
         }
         else {
-            $type = get_class($context);
-            throw new DF_Web_Exception("Context object must be a string or of type DF_Web, isa $type");
+            $base = $context->get_context_class();
         }
     
         if (array_key_exists($name, self::$_components)) {
