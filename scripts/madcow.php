@@ -67,8 +67,6 @@ $root_ctrl = <<<EOF
 <?php
 
 class ${name}_Controller_Root extends DF_Web_Controller {
-    public static \$LOGGER = NULL;
-    
     
     # Run once for this controller per request
     public function handle_auto(\$c) {
