@@ -256,7 +256,7 @@ class DF_Web_Routing {
         }
         
         $tmp_parts = $action->get_path()->get_path_parts();
-        if (count($parts) < $tmp_parts->get_numparts) {
+        if (count($parts) < count($tmp_parts)) {
             $c_rest     = count($rest);
             $c_a_parts  = $tmp_parts->get_numparts();
             throw new DF_Web_Routing_Action_PathMismatchException("Not enough parts for $a_path to eat ($c_rest < $c_a_parts): $path");
@@ -302,6 +302,10 @@ class DF_Web_Routing {
         $a_parts    = $a_path->get_path_parts();
 
         foreach ($a_parts as $tmp) {
+            if ($tmp == '**') {
+                return $parts;
+            }
+
             $part = array_shift($parts);
 
             if ($tmp == '*') {
