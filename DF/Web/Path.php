@@ -14,10 +14,6 @@ class DF_Web_Path implements DF_URL_Path_I {
 
 
     public function __construct($path) {
-        if (NULL === $path) {
-            throw new InvalidArgumentException("Not set: path");
-        }
-
         if (!$path instanceof DF_URL_Path_I) {
             throw new DF_Error_InvalidArgumentException("path", $path, "DF_URL_Path_I");
         }
