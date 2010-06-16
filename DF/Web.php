@@ -232,9 +232,6 @@ class DF_Web {
                 $path .= '/'.$arg;
             }
         }
-        else {
-            $path = "";
-        }
 
         $query_arr = array();
         if ($query)
