@@ -154,7 +154,7 @@ class DF_Web_Routing_Action_Chained
         $captures   = $this->captures;
         $root_chained = $this->is_chained_root ? "Root chained" : "Chained";
         
-        $str = "$root_chained: $chained, Captures: $captures, $parent";
+        $str = "$parent, $root_chained: $chained, Captures: $captures";
         return $str;
     }
 }

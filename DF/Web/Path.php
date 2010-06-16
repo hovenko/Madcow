@@ -14,10 +14,6 @@ class DF_Web_Path implements DF_URL_Path_I {
 
 
     public function __construct($path) {
-        if (NULL === $path) {
-            throw new InvalidArgumentException("Not set: path");
-        }
-
         if (!$path instanceof DF_URL_Path_I) {
             throw new DF_Error_InvalidArgumentException("path", $path, "DF_URL_Path_I");
         }
@@ -70,12 +66,8 @@ class DF_Web_Path implements DF_URL_Path_I {
 
 
     public function append_path($sub) {
-        if (!$sub) {
-            throw new InvalidArgumentException("Not set: sub");
-        }
-
         if (!$sub instanceof DF_Web_Path) {
-            throw new InvalidArgumentException("Not of type DF_Web_Path: sub");
+            throw new DF_Error_InvalidArgumentException('sub', $sub, DF_Web_Path);
         }
 
         $sub_str = "$sub";
@@ -144,3 +136,6 @@ class DF_Web_Path implements DF_URL_Path_I {
     }
     
 }
+
+require_once 'DF/Error/InvalidArgumentException.php';
+
