@@ -4,8 +4,8 @@
  */
 
 
+require_once 'DF/Web/Component/Name.php';
 require_once 'DF/Web/Path.php';
-require_once 'DF/Web/Routing/Component/Name.php';
 require_once 'DF/Web/Routing/Config.php';
 require_once 'DF/Web/Routing/Config/Action.php';
 require_once 'DF/Web/Utils/Components.php';
@@ -56,9 +56,9 @@ class DF_Web_Routing_Config_Controller
 
 
     protected function prepare_path() {
-        $path = $this->namespace;
+        $path = DF_Web_Path::fromString($this->namespace);
 
-        return DF_Web_Path::fromString("$path");
+        return $path;
     }
 
 
@@ -66,7 +66,7 @@ class DF_Web_Routing_Config_Controller
         $action_cfgs = array();
 
         foreach ($tmp = $this->get_config_actions() as $name => $config) {
-            $name = new DF_Web_Routing_Component_Name($name);
+            $name = new DF_Web_Component_Name($name);
             $action_cfg = new DF_Web_Routing_Config_Action($name, $config, $this);
             $name       = $action_cfg->get_name();
             $action_cfgs["$name"] = $action_cfg;

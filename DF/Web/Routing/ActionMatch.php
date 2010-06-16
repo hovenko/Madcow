@@ -21,28 +21,16 @@ class DF_Web_Routing_ActionMatch {
      * @return DF_Web_Routing_ActionMatch
      */
     public function __construct($score, $path, $actions) {
-        if (NULL === $score) {
-            throw new InvalidArgumentException("Not set: score");
-        }
-
         if (!is_int($score)) {
-            throw new InvalidArgumentException("Not an integer: score");
-        }
-
-        if (NULL === $path) {
-            throw new InvalidArgumentException("Not set: path");
+            throw new DF_Error_InvalidArgumentException("score", $score, "integer");
         }
 
         if (!$path instanceof DF_Web_Path) {
-            throw new InvalidArgumentException("Not of type DF_Web_Path: path");
-        }
-
-        if (NULL === $actions) {
-            throw new InvalidArgumentException("Not set: actions");
+            throw new DF_Error_InvalidArgumentException("path", $path, DF_Web_Path);
         }
 
         if (!is_array($actions)) {
-            throw new InvalidArgumentException("Not an array: actions");
+            throw new DF_Error_InvalidArgumentException("actions", $actions, "array");
         }
 
         $this->score    = $score;
@@ -68,12 +56,16 @@ class DF_Web_Routing_ActionMatch {
         if ($this->score < 0) {
             return false;
         }
-    
+
         if ($other === NULL) {
             return true;
         }
 
-        if ($this->sccore < $other->get_score()) {
+        if ($this->score == 0) {
+            return true;
+        }
+
+        if ($this->score < $other->get_score()) {
             return true;
         }
 
@@ -84,7 +76,11 @@ class DF_Web_Routing_ActionMatch {
     public function __toString() {
         $path = $this->path;
         $score = $this->score;
-        $str = "$path (score: $score)";
+        $actions = join(", ", $this->actions);
+        $str = "$path (score: $score) (actions: $actions)";
         return $str;
     }
 }
+
+require_once 'DF/Error/InvalidArgumentException.php';
+

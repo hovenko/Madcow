@@ -70,19 +70,53 @@ class DF_Web_Routing_Action {
     public function get_path_match() {
         $stars = array();
         $args = $this->args;
-        for ($i=0; $i<$args->get_numargs(); $i++) {
-            $stars[] = "*";
+        if ($args instanceof DF_Web_Routing_ActionArgs_Any) {
+            $stars[] = "**";
+        }
+        else {
+            for ($i=0; $i<$args->get_numargs(); $i++) {
+                $stars[] = "*";
+            }
         }
 
         $argspath = join("/", $stars);
 
         $path = $this->get_path();
+        if (!strlen("$path")) {
+            $path = $this->controller->get_path();
+        }
+        elseif (!$path->is_absolute()) {
+            $path = $this->controller->get_path()->append_path($path);
+        }
 
         if ($argspath) {
             $path = $path->append_path(DF_Web_Path::fromString($argspath));
         }
+
+        if (!$path->is_absolute()) {
+            $root = DF_Web_Path::fromString("/");
+            $path = $root->append_path($path);
+        }
         
         return $path;
+    }
+
+
+    public function get_private_path() {
+        $name   = $this->get_name();
+        $ctrl   = $this->get_controller();
+        $ctrlpath   = $ctrl->get_path();
+
+        $private_path = "$name";
+        if (strlen($private_path)) {
+            $private_path = "/$private_path";
+        }
+
+        if ("$ctrlpath") {
+            $private_path = "/$ctrlpath$private_path";
+        }
+
+        return DF_Web_Path::fromString($private_path);
     }
 
 
@@ -122,11 +156,16 @@ class DF_Web_Routing_Action {
 
 
     public function __toString() {
+        $ctrl   = $this->get_controller()->get_name()."";
+        $method = $this->get_method();
+
+        $path_match = $this->get_path_match();
+
         $name   = $this->name;
         $path   = $this->path;
         $args   = $this->args;
         
-        $str = "Name: $name, Path: $path, Args: $args";
+        $str = "$ctrl::$method Pathmatch: $path_match, Name: $name, Path: $path, Args: $args";
         return $str;
     }
 

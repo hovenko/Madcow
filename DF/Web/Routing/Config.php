@@ -6,7 +6,7 @@
 
 /**
  */
-class DF_Web_Routing_Config {
+abstract class DF_Web_Routing_Config {
     protected $name         = NULL;
     protected $config       = NULL;
 
@@ -21,17 +21,12 @@ class DF_Web_Routing_Config {
      * @return DF_Web_Routing_Config
      */
     public function __construct($name, $config) {
-        if (!$name) {
-            throw new InvalidArgumentException("Not set: name");
-        }
-
-        if (!$name instanceof DF_Web_Routing_Component_Name) {
-            $was = gettype($name);
-            throw new InvalidArgumentException("Not of type DF_Web_Routing_Component_Name: name, was $was");
+        if (!$name instanceof DF_Web_Component_Name) {
+            throw new DF_Error_InvalidArgumentException("name", $name, DF_Web_Component_Name);
         }
 
         if (!is_array($config)) {
-            throw new InvalidArgumentException("Not an array: config");
+            throw new DF_Error_InvalidArgumentException("config", $config, "array");
         }
     
         $this->name         = $name;
@@ -69,3 +64,6 @@ class DF_Web_Routing_Config {
         return false;
     }
 }
+
+require_once 'DF/Error/InvalidArgumentException.php';
+
