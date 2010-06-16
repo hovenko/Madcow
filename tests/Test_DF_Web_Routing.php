@@ -15,6 +15,13 @@ class Test_DF_Web_Routing extends UnitTestCase {
 
         $this->routing = new DF_Web_Routing($config);
     }
+    
+    #public function test_action_path_url_match() {
+    #    $input = "http://www.utenlandsbolig.no/paths";
+    #    $url = $input;
+    #    $actions = $this->routing->find_actions_by_url($url);
+    #    $this->assertTrue(count($actions) > 0);
+    #}
 
     public function test_url_match() {
         $input = "http://www.utenlandsbolig.no/land/ES";

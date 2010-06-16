@@ -43,6 +43,17 @@ Controller_Residences:
             path:       ""
             args:       0
 
+#Controller_Paths:
+#    namespace:  stier
+#    actions:
+#        index:
+#            path:       ""
+#            args:       0
+#        default:
+#            path:       ""
+#            args:
+
+
 Model_Testmodel:
     aaa:    new_value
 
