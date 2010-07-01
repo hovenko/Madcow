@@ -8,6 +8,12 @@ class DF_Web_Routing_ActionChain {
 
 
     public function __construct($endpoint) {
+        if (!$endpoint instanceof DF_Web_Routing_Action_Chained) {
+            throw new DF_Error_InvalidArgumentException("endpoint", $endpoint, DF_Web_Routing_Action_Chained);
+        }
+        if (!$endpoint->is_endpoint()) {
+            throw new DF_Web_Exception("Not an endpoint: $endpoint");
+        }
         $this->endpoint = $endpoint;
         $this->chain[]  = $endpoint;
     }
@@ -25,6 +31,23 @@ class DF_Web_Routing_ActionChain {
 
     public function get_chain_list() {
         return array_reverse($this->chain);
+    }
+
+
+    public function get_path_match() {
+        $actions = $this->get_chain_list();
+        $final = NULL;
+        foreach ($actions as $action) {
+            $path = $action->get_path_match();
+            if (NULL === $final) {
+                $final = $path;
+            }
+            else {
+                $final = $final->append_path($path);
+            }
+        }
+
+        return $final;
     }
 
 
