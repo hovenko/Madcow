@@ -174,9 +174,11 @@ class DF_Web_Routing {
         $any = true;
     
         foreach ($this->chained as $chain) {
+            #self::$LOGGER->debug("Chain: \n".$chain->toDebugString());
             $actions    = $chain->get_chain_list();
-            $action     = $chain->get_endpoint();
-            $actionpath = $action->get_path_match();
+            $endpoint   = $chain->get_endpoint();
+            $actionpath = $endpoint->get_path_match();
+            $pathmatch  = $chain->get_path_match();
             $reason = "";
 
             $score = -1;
@@ -188,12 +190,12 @@ class DF_Web_Routing {
                 $reason = $e->getMessage();
             }
 
-            $match = new DF_Web_Routing_ActionMatch($score, $actionpath, $actions);
+            $match = new DF_Web_Routing_ActionMatch($score, $pathmatch, $actions);
             if ($match->is_better_than($best)) {
                 $best = $match;
             }
             else {
-                self::$LOGGER->debug("Not matched $path -> $actionpath ($reason) :: $match");
+                #self::$LOGGER->debug("Not matched $path -> $pathmatch ($reason) :: $match");
             }
         }
 
@@ -220,7 +222,7 @@ class DF_Web_Routing {
         $numparts   = count($parts);
 
         if ($numparts < $a_numparts) {
-            return -1;
+        #    return -1;
         }
 
         $rest = $parts;
@@ -289,38 +291,38 @@ class DF_Web_Routing {
     }
 
 
-    static protected function match_paths($path, $a_path) {
-        $a_parts    = $a_path->get_path_parts();
-        $a_numparts = count($a_parts);
-
-        $parts      = $path->get_path_parts();
-        $numparts   = count($parts);
-
-        if ($numparts < $a_numparts) {
-            # Path is too short
-            return false;
-        }
-
-        for ($i = 0; $i < $numparts; $i++) {
-            $a_part = $a_parts[$i];
-            $part   = $parts[$i];
-
-            if (!$a_part) {
-                # Path is longer
-                return true;
-            }
-
-            if ($a_part == "*") {
-                continue;
-            }
-
-            if (! $a_part->equals($part)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
+#    static protected function match_paths($path, $a_path) {
+#        $a_parts    = $a_path->get_path_parts();
+#        $a_numparts = count($a_parts);
+#
+#        $parts      = $path->get_path_parts();
+#        $numparts   = count($parts);
+#
+#        if ($numparts < $a_numparts) {
+#            # Path is too short
+#            return false;
+#        }
+#
+#        for ($i = 0; $i < $numparts; $i++) {
+#            $a_part = $a_parts[$i];
+#            $part   = $parts[$i];
+#
+#            if (!$a_part) {
+#                # Path is longer
+#                return true;
+#            }
+#
+#            if ($a_part == "*") {
+#                continue;
+#            }
+#
+#            if (! $a_part->equals($part)) {
+#                return false;
+#            }
+#        }
+#
+#        return true;
+#    }
 
 
     static protected function build_path_action($path, $actions) {
