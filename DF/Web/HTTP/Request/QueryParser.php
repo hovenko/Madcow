@@ -42,12 +42,11 @@ class DF_Web_HTTP_Request_QueryParser {
 
         if (is_array($value)) {
             foreach ($value as $key => $sub) {
-                self::flatten_query_structure(&$list, $name, $key, $sub);
+                self::flatten_query_structure($list, $name, $key, $sub);
             }
         }
         else {
             $list[$name] = $value;
-            return $list;
         }
     }
 
