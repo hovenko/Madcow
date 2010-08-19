@@ -5,8 +5,6 @@
 
 
 require_once 'DF/URI/I.php';
-require_once 'DF/URI/MalformedURIException.php';
-require_once 'DF/URI/Scheme.php';
 
 
 /**
@@ -112,3 +110,7 @@ class DF_URI implements DF_URI_I {
     }
     
 }
+
+require_once 'DF/URI/MalformedURIException.php';
+require_once 'DF/URI/Scheme.php';
+
