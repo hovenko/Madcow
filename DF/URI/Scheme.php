@@ -1,9 +1,6 @@
 <?php
 
 
-require_once 'DF/URI/MalformedSchemeException.php';
-
-
 class DF_URI_Scheme {
     
     public static $RE_SCHEME = "[a-z0-9\+\.-]+";
@@ -42,3 +39,5 @@ class DF_URI_Scheme {
         return $this->get_string();
     }
 }
+
+require_once 'DF/URI/MalformedSchemeException.php';
