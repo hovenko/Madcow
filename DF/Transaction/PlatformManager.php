@@ -8,7 +8,7 @@ interface DF_Transaction_PlatformManager {
      *
      * @param DF_Transactional $tx
      */
-    public function commit($tx);
+    public function commit($tx = NULL);
 
     
     /**
@@ -16,7 +16,7 @@ interface DF_Transaction_PlatformManager {
      *
      * @param DF_Transactional $tx
      */
-    public function rollback($tx);
+    public function rollback($tx = NULL);
 
 
     /**

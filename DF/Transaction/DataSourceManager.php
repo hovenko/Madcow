@@ -25,7 +25,10 @@ class DF_Transaction_DataSourceManager
      *
      * @param DF_Transactional $tx
      */
-    public function commit($tx) {
+    public function commit($tx = NULL) {
+        if (!$tx) {
+            $tx = $this->getTransaction();
+        }
         $tx->commit();
     }
 
@@ -35,7 +38,10 @@ class DF_Transaction_DataSourceManager
      *
      * @param DF_Transactional $tx
      */
-    public function rollback($tx) {
+    public function rollback($tx = NULL) {
+        if (!$tx) {
+            $tx = $this->getTransaction();
+        }
         $tx->rollback();
     }
 
