@@ -15,7 +15,7 @@ class DF_Web_Component_Loader {
         try {
             include_once ($filename);
             if (!class_exists($name)) {
-                throw new DF_Web_Exception("Unable to find class $name");
+                throw new DF_Web_Component_LoaderException("Unable to find class $name");
             }
             return true;
         }
@@ -24,7 +24,7 @@ class DF_Web_Component_Loader {
                 throw $ex;
             }
             else {
-                throw new DF_Web_Exception("File could not be loaded: ".$ex->getMessage());
+                throw new DF_Web_Component_LoaderException("File could not be loaded: ".$ex->getMessage());
             }
         }
     }
@@ -51,14 +51,14 @@ class DF_Web_Component_Loader {
 
         if (!class_exists($name)) {
             if (!self::load_file_by_classname($name)) {
-                throw new DF_Web_Exception("Component class does not exist: $name");
+                throw new DF_Web_Component_LoaderException("Component class does not exist: $name");
             }
         }
 
         $component = new $name();
 
         if (! ($component instanceof DF_Web_Component)) {
-            throw new DF_Web_Exception("Class $name does not implement DF_Web_Component");
+            throw new DF_Web_Component_LoaderException("Class $name does not implement DF_Web_Component");
         }
 
         $configname = self::config_name($name, $base);
@@ -82,3 +82,7 @@ class DF_Web_Component_Loader {
         return $config_name;
     }
 }
+
+
+require_once 'DF/Web/Component/LoaderException.php';
+
