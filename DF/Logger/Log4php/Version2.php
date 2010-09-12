@@ -28,7 +28,7 @@ class DF_Logger_Log4php_Version2 {
     static public function isSupported() {
         @include_once 'log4php/Logger.php';
         if (class_exists('Logger')) {
-            if (!method_exists(array('Logger', 'configure'))) {
+            if (!method_exists('Logger', 'configure')) {
                 return false;
             }
             Logger::configure(LOG4PHP_CONFIGURATION);
