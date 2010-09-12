@@ -63,8 +63,13 @@ class DF_URI implements DF_URI_I {
         if (preg_match($re_all, $string, $m)) {
             $scheme     = $m[1];
             $hier       = $m[2];
-            $query      = $m[3];
-            $frag       = $m[4];
+
+            switch (count($m)) {
+                case 5:
+                    $frag       = $m[4];
+                case 4:
+                    $query      = $m[3];
+            }
         }
         else {
             throw new DF_URI_MalformedURIException("URI malformed: $string");
