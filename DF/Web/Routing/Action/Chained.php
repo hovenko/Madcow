@@ -100,7 +100,7 @@ class DF_Web_Routing_Action_Chained
 
         $path = $config->get_path();
 
-        #if ($this->is_chained_root() && $path->is_absolute()) {
+        #if (!$path->is_absolute()) {
         #    $controller = new DF_Web_Path("/".$this->controller->get_path());
         #    $path = $controller->append_path($path);
         #}
