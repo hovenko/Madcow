@@ -121,13 +121,16 @@ class DF_Web {
     }
 
 
+    public function getConfig() {
+        $conf = DF_Util_Arrays::asArray($this->config);
+        return $conf;
+    }
+
+
     public function setup_include_path() {
-        $conf_php   = $this->config['php'];
-        $paths      = $conf_php['includes'];
-    
-        if (!$paths) {
-            $paths = array();
-        }
+        $config     = $this->getConfig();
+        $conf_php   = DF_Util_Arrays::asArray($config['php']);
+        $paths      = DF_Util_Arrays::asArray($conf_php['includes']);
     
         foreach ($paths as $path) {
             self::$LOGGER->debug("Adding include path: $path");
@@ -298,9 +301,15 @@ class DF_Web {
         try {
             $component = DF_Web_Component_Loader::component($class, $this);
         }
-        catch (DF_Web_Exception $ex) {
+        catch (DF_Web_Component_LoaderException $ex) {
+            self::$LOGGER->error("Error loading component $class:\n".$ex->__toString());
             // Dont need the entire stack trace of the component loader
-            throw new DF_Web_Exception($ex->getMessage());
+            throw new DF_Web_Exception("Failed loading component $class:\n".$ex->getMessage());
+        }
+        catch (DF_Web_Exception $ex) {
+            #self::$LOGGER->error("Error initializing component $class:\n".$ex->__toString());
+            throw $ex;
+            #throw new DF_Web_Exception($ex->getMessage());
         }
 
         if (method_exists($component, 'ACCEPT_CONTEXT')) {
@@ -308,10 +317,12 @@ class DF_Web {
                 return $component->ACCEPT_CONTEXT($this);
             }
             catch (DF_Web_Exception $ex) {
-                throw new DF_Web_Exception(
-                    "Failed executing {$class}->ACCEPT_CONTEXT(): "
-                    .$ex->getMessage()
-                );
+                throw $ex;
+                #throw new DF_Web_Exception(
+                #    "Failed executing {$class}->ACCEPT_CONTEXT(): "
+                #    .$ex->getMessage().", exception in "
+                #    .sprintf("%s(%d)",$ex->getFile(),$ex->getLine())
+                #);
             }
         }
 
@@ -367,6 +378,7 @@ class DF_Web {
             return $this->component_prefixed($prefix, $name);
         }
         catch (DF_Web_Exception $ex) {
+            throw $ex;
             // Dont need the entire stack trace of the component loader
             throw new DF_Web_Exception($ex->getMessage());
         }
@@ -1171,6 +1183,8 @@ EOHTML;
             $message    = $error->getNestedMessage();
         }
 
+        $exceptiondetails = sprintf("exception in %s(%d)", $error->getFile(), $error->getLine());
+
         $stacktrace = $error->getTraceAsString();
         self::$LOGGER->error("Caught an error ($class): $message");
         self::$LOGGER->debug("Stack trace: $stacktrace");
@@ -1202,6 +1216,7 @@ pre {
 
 <div class="section">
 $class: $message
+<pre>$exceptiondetails</pre>
 <pre>$stacktrace</pre>
 </div>
 
@@ -1340,4 +1355,6 @@ EOHTML;
 }
 
 DF_Web::$LOGGER = DF_Web_Logger::logger('DF_Web');
+
+require_once 'DF/Util/Arrays.php';
 
