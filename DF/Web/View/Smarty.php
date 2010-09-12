@@ -2,6 +2,10 @@
 
 require_once 'smarty/Smarty.class.php';
 
+/**
+ * FIXME need a better error handler around Smarty,
+ * since Smarty uses trigger_error instead of throwing exceptions.
+ */
 class DF_Web_View_Smarty extends DF_Web_View {
     public static $LOGGER = NULL;
 
@@ -51,19 +55,19 @@ class DF_Web_View_Smarty extends DF_Web_View {
         $smarty->compile_dir    = "$app_root/templates_c";
         $smarty->cache_dir      = "$app_root/smarty/cache";
 
-        if ($tmp = $config['templates_dir']) {
+        if (@$tmp = $config['templates_dir']) {
             $smarty->templates_dir  = $tmp;
         }
 
-        if ($tmp = $config['compile_dir']) {
+        if (@$tmp = $config['compile_dir']) {
             $smarty->compile_dir    = $tmp;
         }
 
-        if ($tmp = $config['cache_dir']) {
+        if (@$tmp = $config['cache_dir']) {
             $smarty->cache_dir    = $tmp;
         }
 
-        if ($tmp = $config['plugins_dir']) {
+        if (@$tmp = $config['plugins_dir']) {
             if (!is_array($tmp)) {
                 $tmp = array($tmp);
             }
