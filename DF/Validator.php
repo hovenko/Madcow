@@ -183,7 +183,8 @@ class DF_Validator {
                 break;
 
             case 'ldap_dn':
-                if (!ldap_explode_dn($value, 0)) {
+                $ldapdn_validator = new DF_Validator_Type_LdapDN();
+                if (!$ldapdn_validator->validate($value)) {
                     $res->setError('type');
                 }
                 break;
@@ -234,7 +235,8 @@ class DF_Validator {
 
 
     static protected function isOptional($rule) {
-        return $rule['optional'] ? TRUE : FALSE;
+        $optional = @$rule['optional'];
+        return $optional ? TRUE : FALSE;
     }
 
 
@@ -265,3 +267,6 @@ class DF_Validator {
 }
 
 DF_Validator::$LOGGER = DF_Logger::logger('DF_Validator');
+
+require_once 'DF/Validator/Type/LdapDN.php';
+
