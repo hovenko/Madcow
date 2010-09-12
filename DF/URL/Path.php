@@ -62,6 +62,10 @@ class DF_URL_Path implements DF_URL_Path_I {
 
     static private function check_has_trailing_slash($string) {
         $last_idx = strlen($string) - 1;
+        if ($last_idx < 0) {
+            return false;
+        }
+
         if ($string[$last_idx] == "/") {
             return true;
         }
