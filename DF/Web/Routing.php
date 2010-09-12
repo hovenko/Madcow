@@ -43,6 +43,16 @@ class DF_Web_Routing {
     }
 
 
+    /**
+     * Returns a list of action objects with configured paths.
+     * 
+     * @return array
+     */
+    public function getActions() {
+        return $this->actions;
+    }
+
+
     static protected function resolve_chained_actions($actions) {
         $resolved = array();
 

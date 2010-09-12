@@ -509,6 +509,13 @@ class DF_Web {
     }
 
 
+    /**
+     * @return DF_Web_Routing
+     */
+    public function getRouting() {
+        return $this->routing;
+    }
+
 
     public function execute() {
         $request    = $this->request;
