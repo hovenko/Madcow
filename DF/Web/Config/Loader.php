@@ -77,7 +77,7 @@ class DF_Web_Config_Loader {
      * @return array
      */
     protected function parse($file) {
-        require_once 'Spyc/spyc.php5';
+        self::loadSpycLibrary();
         $config = Spyc::YAMLLoad($file);
         
         if (!$config) {
@@ -85,6 +85,21 @@ class DF_Web_Config_Loader {
         }
         
         return $config;
+    }
+
+
+    static private function loadSpycLibrary() {
+        if (!class_exists('Spyc')) {
+            @include_once 'Spyc/spyc.php5';
+        }
+
+        if (!class_exists('Spyc')) {
+            @include_once 'spyc.php';
+        }
+
+        if (!class_exists('Spyc')) {
+            throw new DF_Exception("YAML Spyc library not found");
+        }
     }
 }
 
