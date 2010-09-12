@@ -45,7 +45,7 @@ class DF_Web_HTTP_Path {
     public static function split_parts($path) {
         $arguments = array();
 
-        $parts = split('/', $path);
+        $parts = preg_split('#/#', $path);
         if (!$parts) {
             return $path;
         }
