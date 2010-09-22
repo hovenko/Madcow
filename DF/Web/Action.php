@@ -112,8 +112,9 @@ class DF_Web_Action {
         #}
 
         try {
+            $callback = array($controller, "$method_name");
             $ret = call_user_func_array(
-                array($controller, $method_name),
+                $callback,
                 $arguments
             );
 
@@ -126,6 +127,10 @@ class DF_Web_Action {
         catch (DF_Web_Exception $ex) {
             $c->add_error($ex);
             self::$LOGGER->error("Fatal exception: ".$ex->getMessage());
+            throw new DF_Web_Detach_Exception(
+                $this,
+                "Got an error we cannot handle"
+            );
         }
         catch (Exception $ex) {
             $c->add_error($ex);
