@@ -106,6 +106,10 @@ class DF_Web {
      * It logs all messages as warnings using the default logger.
      */
     public function default_error_handler($errno, $errstr, $errfile, $errline) {
+        if (preg_match('#DF/Web/.*\.php#', $errfile)) {
+            // internal code
+            throw new DF_Web_Exception("$errstr $errno $errfile $errline");
+        }
         self::$LOGGER->warn("$errstr $errno $errfile $errline");
     }
 
