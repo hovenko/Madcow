@@ -108,7 +108,7 @@ class DF_Web {
     public function default_error_handler($errno, $errstr, $errfile, $errline) {
         if (preg_match('#DF/Web/.*\.php#', $errfile)) {
             // internal code
-            throw new DF_Web_Exception("$errstr $errno $errfile $errline");
+            throw new DF_Web_Exception("$errstr errno:$errno file:$errfile line:$errline");
         }
         self::$LOGGER->warn("$errstr $errno $errfile $errline");
     }
