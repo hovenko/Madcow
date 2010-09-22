@@ -112,6 +112,7 @@ class DF_Web_Action {
         #}
 
         try {
+            # FIXME this inits an error if the callback is a protected method
             $callback = array($controller, "$method_name");
             $ret = call_user_func_array(
                 $callback,
