@@ -470,7 +470,8 @@ class DF_Web {
         $schema = $parts['schema'];
         $rest   = $parts['rest'];
 
-        throw new DF_Web_Exception("Don't know how to handle schema: $schema");
+        return $uri;
+        #throw new DF_Web_Exception("Don't know how to handle schema: $schema");
     }
 
 
@@ -479,6 +480,9 @@ class DF_Web {
 
         $parts = self::split_uri($uri);
         $schema = $parts['schema'];
+        $rest   = $parts['rest'];
+
+        self::$LOGGER->debug("Handling schema $schema of $rest");
 
         switch ($schema) {
             case 'http':
