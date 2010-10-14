@@ -1230,7 +1230,7 @@ pre {
 <body>
 
 <div class="section">
-$class: $message
+<pre>$class: $message</pre>
 <pre>$exceptiondetails</pre>
 <pre>$stacktrace</pre>
 </div>
