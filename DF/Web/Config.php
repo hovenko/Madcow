@@ -7,6 +7,7 @@ require_once 'DF/Web/Environment.php';
 require_once 'DF/Web/Logger.php';
 
 
+# TODO add environment configurable path to read configuration
 class DF_Web_Config {
     public static $LOGGER = NULL;
 
