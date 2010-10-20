@@ -889,7 +889,7 @@ class DF_Web {
         $port       = $_SERVER['SERVER_PORT'];
 
         if ($req_path && !DF_Web_HTTP_Path::has_base_path($req_path, $base_path)) {
-            throw new DF_Web_Exception("Requested path does not contain base path: $req_path");
+            throw new DF_Web_Exception("Requested path ($req_path) does not contain base path: $base_path");
         }
 
         $req_path   = DF_Web_HTTP_Path::strip_base_path($req_path, $base_path);
