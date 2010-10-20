@@ -62,5 +62,10 @@ class DF_Web_Environment {
      */
     public $base_path       = NULL;
 
+
+    /**
+     * By enabling this a stack trace with debug output will be
+     * printed in case of an error.
+     */
     public $debug           = false;
 }
