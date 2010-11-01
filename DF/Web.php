@@ -846,7 +846,11 @@ class DF_Web {
 
 
     private function setup_session_handler() {
-        $sh = new DF_Web_SessionHandler();
+        $config     = $this->getConfig();
+        $conf_session   = DF_Util_Arrays::asArray($config['session']);
+        $session_path   = $conf_session['save_path'];
+
+        $sh = new DF_Web_SessionHandler($session_path);
         session_set_save_handler(
             array($sh, "open"),
             array($sh, "close"),
