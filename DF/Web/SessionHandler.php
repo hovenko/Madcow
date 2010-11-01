@@ -30,10 +30,15 @@ class DF_Web_SessionHandler {
     /**
      * Constructor.
      * 
+     * @param string $path
      * @return DF_Web_SessionHandler
      */
-    public function __construct() {
-        
+    public function __construct($path = NULL) {
+        if ($path && !file_exists($path)) {
+            throw new DF_Web_Exception("Path does not exist: $path");
+        }
+
+        $this->save_path = $path;
     }
     
     
@@ -59,7 +64,9 @@ class DF_Web_SessionHandler {
      * @return boolean
      */
     public function open($save_path, $session_name) {
-        $this->save_path = $save_path;
+        if (!$this->save_path) {
+            $this->save_path = $save_path;
+        }
         
         return TRUE;
     }
