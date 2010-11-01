@@ -210,7 +210,7 @@ class DF_Web_Routing {
         }
 
         if ($best) {
-            self::$LOGGER->info("Matched $path -> $best");
+            self::$LOGGER->debug("Matched $path -> $best");
         }
         else {
             self::$LOGGER->warn("Not matched $path");
