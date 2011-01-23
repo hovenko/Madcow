@@ -1064,7 +1064,9 @@ class DF_Web {
     public function log_execution_time() {
         $time = $this->get_execution_time();
         $time = round($time, 3);
-        self::$LOGGER->debug("Page processing time: $time seconds");
+        $request    = $this->request;
+        $path       = DF_Web_Path::fromString($request->get_path());
+        self::$LOGGER->debug("Page processing time: $time seconds ($path)");
     }
 
 
