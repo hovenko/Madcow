@@ -32,7 +32,12 @@ class DF_Web {
     public $session     = NULL;
     protected $base_path    = NULL;
     protected $errors   = array();
+
+    /**
+     * @var DF_Web_Config
+     */
     protected $config   = NULL;
+
     protected $debug    = false;
     public $environment = NULL;
 
@@ -43,6 +48,8 @@ class DF_Web {
 
     protected $action_classes   = array();
 
+    protected $component_loader = NULL;
+
     protected $user         = NULL;
     protected $_tried_auth  = false;
 
@@ -51,7 +58,7 @@ class DF_Web {
     public function __construct() {
         $this->start_time = DF_Web_Time::microtime_float();
 
-        $this->config = DF_Web_Config::get_config();
+        $this->config = new DF_Web_Config();
 
         $this->setup_include_path();
 
@@ -72,10 +79,17 @@ class DF_Web {
 
         $this->setup_defaults();
 
+        $this->component_loader = new DF_Web_Component_Loader($this);
+
         if ($this->debug) {
             self::$LOGGER->debug("###");
             self::$LOGGER->debug("### Context initialized");
         }
+    }
+
+
+    public function config() {
+        return $this->config;
     }
 
 
@@ -126,8 +140,7 @@ class DF_Web {
 
 
     public function getConfig() {
-        $conf = DF_Util_Arrays::asArray($this->config);
-        return $conf;
+        return $this->config->get_config();
     }
 
 
@@ -169,7 +182,8 @@ class DF_Web {
 
     // FIXME cannot be here
     protected function setup_defaults() {
-        $this->stash['site']['title']   = $this->config['title'];
+        $config = $this->getConfig();
+        $this->stash['site']['title']   = $config['title'];
 
         $this->response->add_stylesheet(
             "reset",
@@ -303,7 +317,7 @@ class DF_Web {
         $component = NULL;
 
         try {
-            $component = DF_Web_Component_Loader::component($class, $this);
+            $component = $this->component_loader->component($class);
         }
         catch (DF_Web_Component_LoaderException $ex) {
             self::$LOGGER->error("Error loading component $class:\n".$ex->__toString());
@@ -364,13 +378,14 @@ class DF_Web {
     
 
     public function model($name) {
+        $config = $this->getConfig();
         if (!is_string($name)) {
             throw new DF_Error_InvalidArgumentException("name", $name, "string");
         }
         
-        if (isset($this->config['testmodels'])) {
-            $testmodels = $this->config['testmodels'];
-            if (isset($this->config['testmodels'][$name])) {
+        if (isset($config['testmodels'])) {
+            $testmodels = $config['testmodels'];
+            if (isset($config['testmodels'][$name])) {
                 return $this->component($testmodels[$name]);
             }
         }
@@ -422,7 +437,7 @@ class DF_Web {
 
 
     public function prepare_routing() {
-        $config = $this->config;
+        $config = $this->getConfig();
         return new DF_Web_Routing($config);
     }
 
@@ -966,6 +981,7 @@ class DF_Web {
 
     protected function render_body() {
         $response = $this->response;
+        $config = $this->getConfig();
 
         if ($response->body) {
             if ($this->debug)
@@ -976,7 +992,7 @@ class DF_Web {
             return;
         }
 
-        $viewname   = $this->config['default_view'];
+        $viewname   = $config['default_view'];
         if (isset($this->stash['current_view'])
                 && $this->stash['current_view']) {
             $viewname = $this->stash['current_view'];
@@ -1080,7 +1096,8 @@ class DF_Web {
 
 
     public function create_empty_user() {
-        $userclass = $this->config['authentication']['userclass'];
+        $config = $this->getConfig();
+        $userclass = $config['authentication']['userclass'];
 
         self::loadClassFile($userclass);
         

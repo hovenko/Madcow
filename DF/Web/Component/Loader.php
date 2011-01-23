@@ -6,7 +6,7 @@ require_once 'DF/Web/Exception.php';
 
 class DF_Web_Component_Loader {
 
-    private static $_components = array();
+    private $_components = array();
 
     private static function load_file_by_classname($name) {
         $filename = preg_replace('|_|', '/', $name);
@@ -29,11 +29,26 @@ class DF_Web_Component_Loader {
         }
     }
 
-    public static function component($name, $context) {
+
+    /**
+     * @var DF_Web
+     */
+    private $c = NULL;
+
+
+    public function __construct($context) {
+        if (!$context instanceof DF_Web) {
+            throw new DF_Error_InvalidArgumentException("context", $context, DF_Web);
+        }
+
+        $this->c = $context;
+    }
+
+    public function component($name, $context = NULL) {
         $base = NULL;
 
-        if (NULL === $context) {
-            throw new DF_Web_Exception("A context object must be given");
+        if (!$context) {
+            $context = $this->c;
         }
         elseif (is_string($context)) {
             $base = $context;
@@ -45,8 +60,8 @@ class DF_Web_Component_Loader {
             $base = $context->get_context_class();
         }
     
-        if (array_key_exists($name, self::$_components)) {
-            return self::$_components[$name];
+        if (array_key_exists($name, $this->_components)) {
+            return $this->_components[$name];
         }
 
         if (!class_exists($name)) {
@@ -62,7 +77,7 @@ class DF_Web_Component_Loader {
         }
 
         $configname = self::config_name($name, $base);
-        $config = DF_Web_Config::find_by_id($configname);
+        $config = $this->c->config()->find_by_id($configname);
         if ($config == NULL) {
             $config = array();
         }
@@ -71,7 +86,7 @@ class DF_Web_Component_Loader {
 
         $component->initialize($context);
 
-        self::$_components[$name] = $component;
+        $this->_components[$name] = $component;
 
         return $component;
     }
