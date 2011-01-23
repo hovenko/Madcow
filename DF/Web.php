@@ -147,6 +147,8 @@ class DF_Web {
         if ($env->environment == DF_Web_Environment::$ENV_DEVELOPMENT) {
             ini_set('display_errors', 1);
         }
+        
+        $this->stash['environment'] = $env->environment;
     }
 
 
