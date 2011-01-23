@@ -17,7 +17,9 @@ class DF_Web_Component {
     }
 
     public function config($config = NULL) {
-        $this->config = DF_Web_Utils_Config::merge_hashes($this->config, $config);
+        if (NULL !== $config) {
+            $this->config = DF_Web_Utils_Config::merge_hashes($this->config, $config);
+        }
         return $this->config;
     }
 
