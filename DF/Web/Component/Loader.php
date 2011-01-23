@@ -44,21 +44,12 @@ class DF_Web_Component_Loader {
         $this->c = $context;
     }
 
-    public function component($name, $context = NULL) {
+    public function component($name) {
         $base = NULL;
 
-        if (!$context) {
-            $context = $this->c;
-        }
-        elseif (is_string($context)) {
-            $base = $context;
-        }
-        elseif (!$context instanceof DF_Web) {
-            throw new DF_Error_InvalidArgumentException("context", $context, DF_Web);
-        }
-        else {
-            $base = $context->get_context_class();
-        }
+        $context = $this->c;
+
+        $base = $context->get_context_class();
     
         if (array_key_exists($name, $this->_components)) {
             return $this->_components[$name];
