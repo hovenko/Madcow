@@ -16,22 +16,55 @@ class DF_Web_Routing {
 
     protected $config       = NULL;
 
-    protected $actions      = array();
+    protected $chained      = array();
+
+    private $c;
 
 
-    public function __construct($config) {
+    public function __construct($context) {
+        $this->c = $context;
+        $config = $context->getConfig();
         $this->config   = $config;
         $this->init();
     }
 
 
+    protected function init_from_resources() {
+        $res_path = $this->c->get_resources_path();
+        $res_file = "$res_path/routing.php";
+        if (file_exists($res_file)) {
+            $res = file_get_contents($res_file);
+            $routing = unserialize($res);
+            return $routing;
+        }
+
+        return NULL;
+    }
+
+
+    protected function save_to_resources($actions, $chained) {
+        $res_path = $this->c->get_resources_path();
+        $res_file = "$res_path/routing.php";
+
+        $res = array(
+            'chained'   => $chained
+        );
+
+        $php = serialize($res);
+        file_put_contents($res_file, $php);
+    }
+
+
     protected function init() {
+        #if ($res = $this->init_from_resources()) {
+        #    $this->chained = $res['chained'];
+        #}
+
         $config = $this->config;
         $controllers    = self::controller_configs($config);
         $paths          = self::resolve_controller_paths($controllers);
 
         $actions        = self::resolve_actions($paths);
-        $this->actions  = $actions;
 
         #error_log("Available actions:");
         #foreach ($actions as $name => $action) {
@@ -40,16 +73,8 @@ class DF_Web_Routing {
 
         $chained        = self::resolve_chained_actions($actions);
         $this->chained  = $chained;
-    }
 
-
-    /**
-     * Returns a list of action objects with configured paths.
-     * 
-     * @return array
-     */
-    public function getActions() {
-        return $this->actions;
+        #$this->save_to_resources($actions, $chained);
     }
 
 
@@ -421,7 +446,7 @@ class DF_Web_Routing {
             }
 
             $obj = new DF_Web_Action(
-                $action->get_controller()->get_name()."",
+                $action->get_controller_name()."",
                 $action->get_method()."",
                 $arguments
             );

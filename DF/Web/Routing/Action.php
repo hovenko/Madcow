@@ -17,7 +17,8 @@ class DF_Web_Routing_Action {
     protected $path         = NULL;
     protected $args         = NULL;
 
-    protected $controller   = NULL;
+    protected $controller_path  = NULL;
+    protected $controller_name  = NULL;
 
 
     /**
@@ -36,7 +37,8 @@ class DF_Web_Routing_Action {
         }
 
         $ctrl = $config->get_controller();
-        $this->controller   = $ctrl;
+        $this->controller_name  = $ctrl->get_name();
+        $this->controller_path  = $ctrl->get_path();
 
         $this->name     = $config->get_name();
         $this->path     = $config->get_path();
@@ -83,10 +85,10 @@ class DF_Web_Routing_Action {
 
         $path = $this->get_path();
         if (!strlen("$path")) {
-            $path = $this->controller->get_path();
+            $path = $this->controller_path;
         }
         elseif (!$path->is_absolute()) {
-            $path = $this->controller->get_path()->append_path($path);
+            $path = $this->controller_path->append_path($path);
         }
 
         if ($argspath) {
@@ -102,10 +104,14 @@ class DF_Web_Routing_Action {
     }
 
 
+    public function get_controller_name() {
+        return $this->controller_name;
+    }
+
+
     public function get_private_path() {
         $name   = $this->get_name();
-        $ctrl   = $this->get_controller();
-        $ctrlpath   = $ctrl->get_path();
+        $ctrlpath   = $this->controller_path;
 
         $private_path = "$name";
         if (strlen($private_path)) {
@@ -130,11 +136,6 @@ class DF_Web_Routing_Action {
     }
 
 
-    public function get_controller() {
-        return $this->controller;
-    }
-
-
     public function get_path() {
         return $this->path;
     }
@@ -148,7 +149,7 @@ class DF_Web_Routing_Action {
 
 
     public function get_code_ref() {
-        $ctrl = $this->get_controller()->get_name()."";
+        $ctrl = $this->controller_name."";
         $method = $this->get_method();
         $ref = array($ctrl, $method);
         return $ref;
@@ -156,7 +157,7 @@ class DF_Web_Routing_Action {
 
 
     public function __toString() {
-        $ctrl   = $this->get_controller()->get_name()."";
+        $ctrl   = $this->controller_name;
         $method = $this->get_method();
 
         $path_match = $this->get_path_match();

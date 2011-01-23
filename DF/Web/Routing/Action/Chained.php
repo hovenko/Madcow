@@ -15,7 +15,6 @@ class DF_Web_Routing_Action_Chained
         extends DF_Web_Routing_Action {
     public static $LOGGER = NULL;
 
-    protected $config       = NULL;
     protected $chained      = NULL;
     protected $captures     = NULL;
     protected $is_chained_root  = false;
@@ -24,19 +23,15 @@ class DF_Web_Routing_Action_Chained
     protected function init_local($config) {
         parent::init_local($config);
 
-        $this->config = $config;
-        
-        if (!$this->has_config_chained()) {
+        if (!$this->has_config_chained($config)) {
             throw new InvalidArgumentException("Missing configuration property: chained");
         }
         
-        $this->chained  = $this->prepare_chained();
+        $this->chained  = $this->prepare_chained($config);
         $this->captures = $this->prepare_captures($config);
 
-        $this->path     = $this->prepare_path();
+        $this->path     = $this->prepare_path($config);
         $this->is_chained_root  = $this->prepare_is_chained_root($this->chained);
-
-        unset($this->config);
     }
 
 
@@ -45,12 +40,12 @@ class DF_Web_Routing_Action_Chained
     }
 
 
-    protected function prepare_chained() {
-        $chained        = $this->get_config_chained();
+    protected function prepare_chained($config) {
+        $chained        = $this->get_config_chained($config);
         $chained_path   = DF_Web_Path::fromString($chained);
 
         if (!$chained_path->is_absolute()) {
-            $controller = DF_Web_Path::fromString("/".$this->controller->get_path());
+            $controller = DF_Web_Path::fromString("/".$this->controller_path);
             $chained_path = $controller->append_path($chained_path);
         }
 
@@ -87,9 +82,7 @@ class DF_Web_Routing_Action_Chained
     }
 
 
-    protected function prepare_path() {
-        $config = $this->config;
-
+    protected function prepare_path($config) {
         $stars = array();
         $captures = $this->captures;
         for ($i=0; $i<$captures->get_numargs(); $i++) {
@@ -139,13 +132,13 @@ class DF_Web_Routing_Action_Chained
     }
 
 
-    protected function get_config_chained() {
-        return $this->config->get('chained');
+    protected function get_config_chained($config) {
+        return $config->get('chained');
     }
 
 
-    protected function has_config_chained() {
-        if ($this->config->has('chained')) {
+    protected function has_config_chained($config) {
+        if ($config->has('chained')) {
             return true;
         }
         

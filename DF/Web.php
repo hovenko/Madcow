@@ -48,6 +48,8 @@ class DF_Web {
 
     protected $action_classes   = array();
 
+    private $resources_path = NULL;
+
     protected $component_loader = NULL;
 
     protected $user         = NULL;
@@ -59,6 +61,8 @@ class DF_Web {
         $this->start_time = DF_Web_Time::microtime_float();
 
         $this->config = new DF_Web_Config();
+
+        $this->setup_resources_path();
 
         $this->setup_include_path();
 
@@ -90,6 +94,13 @@ class DF_Web {
 
     public function config() {
         return $this->config;
+    }
+
+
+    protected function setup_resources_path() {
+        $env = DF_Web_Environment::singleton();
+        $app_root   = $env->app_root;
+        $this->resources_path = File::buildPath(array($app_root, "resources"));
     }
 
 
@@ -438,7 +449,12 @@ class DF_Web {
 
     public function prepare_routing() {
         $config = $this->getConfig();
-        return new DF_Web_Routing($config);
+        return new DF_Web_Routing($this);
+    }
+
+
+    public function get_resources_path() {
+        return $this->resources_path;
     }
 
 
