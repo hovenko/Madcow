@@ -20,6 +20,7 @@ class DF_Web_Config {
 
 
     public function find_by_id($id) {
+        #self::$LOGGER->debug("Web_Config->find_by_id($id)");
         $config = $this->get_config();
         if (!array_key_exists($id, $config)) {
             return array();
