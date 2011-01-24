@@ -62,7 +62,7 @@ class DF_Web_HTTP_Request_QueryParser {
 
             // PHP replaces . with _ in parameter names, for some reason
             if (strpos($key, '_') !== false) {
-                $key_parts = split('_', $key);
+                $key_parts = preg_split('#_#', $key);
             }
             else {
                 $key_parts = array($key);
