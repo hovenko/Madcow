@@ -124,21 +124,28 @@ class DF_Web_View_Smarty extends DF_Web_View {
         $smarty->assign('template', $template);
 
         if (isset($config['layout']) && $config['layout']) {
-            $output = $smarty->fetch($config['layout']);
+            $output = $this->fetch($config['layout']);
             $smarty->assign('content', $output);
         }
         
         if (isset($config['wrapper']) && $config['wrapper']) {
-            $output = $smarty->fetch($config['wrapper']);
+            $output = $this->fetch($config['wrapper']);
         }
 
         if (strlen($output) === 0) {
-            $output = $smarty->fetch($template);
+            $output = $this->fetch($template);
         }
 
         self::$LOGGER->debug("Render success");
 
         return $output;
+    }
+    
+    
+    private function fetch($template) {
+    	$smarty	= $this->getSmarty();
+    	$output = @$smarty->fetch($template);
+    	return $output;
     }
 }
 
