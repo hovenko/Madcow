@@ -161,11 +161,26 @@ class DF_Web {
         $config     = $this->getConfig();
         $conf_php   = DF_Util_Arrays::asArray($config['php']);
         $paths      = DF_Util_Arrays::asArray($conf_php['includes']);
+        $pre        = false;
     
-        foreach ($paths as $path) {
-            self::$LOGGER->debug("Adding include path: $path");
-            set_include_path($path . ":" . get_include_path());
+        if (!$paths) {
+            $paths = array();
         }
+
+        $old_path = get_include_path();
+        $new_path = join(PATH_SEPARATOR, $paths);
+
+        $pre_string = $pre ? "prepending" : "appending";
+        self::$LOGGER->debug("Adding $pre_string include path: $new_path");
+
+        if ($pre) {
+            $new_path = $new_path.PATH_SEPARATOR.$old_path;
+        }
+        else {
+            $new_path = $old_path.PATH_SEPARATOR.$new_path;
+        }
+
+        set_include_path($new_path);
     }
 
 
