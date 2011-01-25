@@ -83,6 +83,12 @@ class DF_Web_Action {
     }
 
 
+    /**
+     * 
+     * @param DF_Web_Controller $controller
+     * @param DF_Web $c
+     * @return mixed
+     */
     public function execute($controller, $c) {
         if (!$controller instanceof DF_Web_Controller) {
             throw new DF_Error_InvalidArgumentException("controller", $controller, DF_Web_Controller);
@@ -113,12 +119,7 @@ class DF_Web_Action {
 
         try {
             # FIXME this inits an error if the callback is a protected method
-            $callback = array($controller, "$method_name");
-            $ret = call_user_func_array(
-                $callback,
-                $arguments
-            );
-
+            $ret = self::execute_action_by_params($controller, $method_name, $arguments);
             return $ret;
         }
         catch (DF_Web_Detach_Exception $ex) {
@@ -143,6 +144,29 @@ class DF_Web_Action {
         }
 
         return false;
+    }
+    
+    
+    /**
+     * 
+     * @param DF_Web_Controller $controller
+     * @param string $method_name
+     * @param array $arguments
+     * @throws DF_Error_InvalidArgumentException
+     * @return mixed
+     */
+    static private function execute_action_by_params($controller, $method_name, $arguments) {
+        if (!$controller instanceof DF_Web_Controller) {
+            throw new DF_Error_InvalidArgumentException("controller", $controller, DF_Web_Controller);
+        }
+        
+        $callback = array($controller, "$method_name");
+        $ret = call_user_func_array(
+            $callback,
+            $arguments
+        );
+
+        return $ret;
     }
 
 

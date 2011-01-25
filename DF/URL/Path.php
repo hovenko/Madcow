@@ -20,10 +20,6 @@ class DF_URL_Path implements DF_URL_Path_I {
 
 
     public function __construct($string) {
-        if (NULL === $string) {
-            throw new InvalidArgumentException("Not set: string");
-        }
-
         if (!is_string($string)) {
             throw new DF_Error_InvalidArgumentException("string", $string, "string");
         }
@@ -75,7 +71,7 @@ class DF_URL_Path implements DF_URL_Path_I {
 
 
     static private function check_is_absolute($string) {
-        if (strpos($string, '/') === 0) {
+        if ($string && $string[0] == '/') {
             return true;
         }
 

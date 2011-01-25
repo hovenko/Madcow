@@ -3,12 +3,12 @@
 
 require_once 'DF/URL/Path/I.php';
 
-require_once 'DF/Web/HTTP/Path.php';
-require_once 'DF/Web/Path/Part.php';
-
 
 class DF_Web_Path implements DF_URL_Path_I {
 
+    /**
+     * @var DF_URL_Path_I
+     */
     protected $path = NULL;
 
 
@@ -22,8 +22,12 @@ class DF_Web_Path implements DF_URL_Path_I {
     }
 
 
+    /**
+     * 
+     * @param string $string
+     * @return DF_Web_Path
+     */
     static public function fromString($string) {
-        require_once 'DF/URL/Path.php';
         $path = new DF_URL_Path($string);
         return new DF_Web_Path($path);
     }
@@ -65,6 +69,11 @@ class DF_Web_Path implements DF_URL_Path_I {
     }
 
 
+    /**
+     * 
+     * @param DF_Web_Path $sub
+     * @return DF_Web_Path
+     */
     public function append_path($sub) {
         if (!$sub instanceof DF_Web_Path) {
             throw new DF_Error_InvalidArgumentException('sub', $sub, DF_Web_Path);
@@ -123,6 +132,9 @@ class DF_Web_Path implements DF_URL_Path_I {
     }
     
 
+    /**
+     * @return array
+     */
     public function get_path_parts() {
         $arr = DF_Web_HTTP_Path::split_parts($this->path."");
         $parts = array();
@@ -138,4 +150,6 @@ class DF_Web_Path implements DF_URL_Path_I {
 }
 
 require_once 'DF/Error/InvalidArgumentException.php';
-
+require_once 'DF/URL/Path.php';
+require_once 'DF/Web/HTTP/Path.php';
+require_once 'DF/Web/Path/Part.php';

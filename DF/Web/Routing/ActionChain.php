@@ -3,10 +3,18 @@
 
 class DF_Web_Routing_ActionChain {
 
+    /**
+     * @var DF_Web_Routing_Action_Chained
+     */
     protected $endpoint = NULL;
+    
     protected $chain    = array();
 
 
+    /**
+     * 
+     * @param DF_Web_Routing_Action_Chained $endpoint
+     */
     public function __construct($endpoint) {
         if (!$endpoint instanceof DF_Web_Routing_Action_Chained) {
             throw new DF_Error_InvalidArgumentException("endpoint", $endpoint, DF_Web_Routing_Action_Chained);

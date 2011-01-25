@@ -10,6 +10,9 @@ abstract class DF_Web_Routing_Config {
     protected $name         = NULL;
     protected $config       = NULL;
 
+    /**
+     * @var DF_Web_Path
+     */
     protected $path         = NULL;
 
 
@@ -46,6 +49,9 @@ abstract class DF_Web_Routing_Config {
     }
 
 
+    /**
+     * @return DF_Web_Path
+     */
     public function get_path() {
         return $this->path;
     }

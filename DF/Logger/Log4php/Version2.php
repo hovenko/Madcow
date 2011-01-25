@@ -31,6 +31,7 @@ class DF_Logger_Log4php_Version2 {
             if (!method_exists('Logger', 'configure')) {
                 return false;
             }
+            
             Logger::configure(LOG4PHP_CONFIGURATION);
             return true;
         }

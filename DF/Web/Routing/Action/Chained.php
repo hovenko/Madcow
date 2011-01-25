@@ -15,11 +15,20 @@ class DF_Web_Routing_Action_Chained
         extends DF_Web_Routing_Action {
     public static $LOGGER = NULL;
 
+    /**
+     * @var DF_Web_Path
+     */
     protected $chained      = NULL;
+    
     protected $captures     = NULL;
     protected $is_chained_root  = false;
 
 
+    /**
+     * (non-PHPdoc)
+     * @see DF_Web_Routing_Action::init_local()
+     * @param DF_Web_Routing_Config_Action $config
+     */
     protected function init_local($config) {
         parent::init_local($config);
 
@@ -35,11 +44,19 @@ class DF_Web_Routing_Action_Chained
     }
 
 
+    /**
+     * @return DF_Web_Path
+     */
     public function get_chained() {
         return $this->chained;
     }
 
 
+    /**
+     * 
+     * @param DF_Web_Routing_Config_Action $config
+     * @return DF_Web_Path
+     */
     protected function prepare_chained($config) {
         $chained        = $this->get_config_chained($config);
         $chained_path   = DF_Web_Path::fromString($chained);
@@ -53,6 +70,11 @@ class DF_Web_Routing_Action_Chained
     }
 
 
+    /**
+     * (non-PHPdoc)
+     * @see DF_Web_Routing_Action::get_path_match()
+     * @return DF_Web_Path
+     */
     public function get_path_match() {
         if ($this->is_endpoint()) {
             $stars = array();
@@ -75,13 +97,17 @@ class DF_Web_Routing_Action_Chained
             }
     
             return $path;
-    
         }
         
         return $this->get_path();
     }
 
 
+    /**
+     * 
+     * @param DF_Web_Routing_Config_Action $config
+     * @return DF_Web_Path
+     */
     protected function prepare_path($config) {
         $stars = array();
         $captures = $this->captures;
@@ -120,6 +146,11 @@ class DF_Web_Routing_Action_Chained
     }
 
 
+    /**
+     * 
+     * @param DF_Web_Routing_Config_Action $config
+     * @return DF_Web_Routing_ActionArgs
+     */
     protected function prepare_captures($config) {
         $numargs = 0;
         if ($config->has('captures')) {
@@ -132,11 +163,19 @@ class DF_Web_Routing_Action_Chained
     }
 
 
+    /**
+     * 
+     * @param DF_Web_Routing_Config_Action $config
+     */
     protected function get_config_chained($config) {
         return $config->get('chained');
     }
 
 
+    /**
+     * 
+     * @param DF_Web_Routing_Config_Action $config
+     */
     protected function has_config_chained($config) {
         if ($config->has('chained')) {
             return true;

@@ -15,6 +15,7 @@ class DF_Logger_Log4php {
         if (DF_Logger_Log4php_Version2::isSupported()) {
             return DF_Logger_Log4php_Version2::singleton();
         }
+        
         if (DF_Logger_Log4php_OldVersion::isSupported()) {
             return DF_Logger_Log4php_OldVersion::singleton();
         }

@@ -14,7 +14,12 @@ class DF_Web_Routing_Action {
     public static $LOGGER = NULL;
 
     protected $name         = NULL;
+    
+    /**
+     * @var DF_Web_Path
+     */
     protected $path         = NULL;
+    
     protected $args         = NULL;
 
     protected $controller_path  = NULL;
@@ -28,12 +33,8 @@ class DF_Web_Routing_Action {
      * @return DF_Web_Routing_Action
      */
     public function __construct($config) {
-        if (!$config) {
-            throw new InvalidArgumentException("Not set: config");
-        }
-
         if (! $config instanceof DF_Web_Routing_Config_Action) {
-            throw new InvalidArgumentException("Not of type DF_Web_Routing_Config_Action: config");
+            throw new DF_Error_InvalidArgumentException("config", $config, DF_Web_Routing_Config_Action);
         }
 
         $ctrl = $config->get_controller();
@@ -48,6 +49,10 @@ class DF_Web_Routing_Action {
     }
 
 
+    /**
+     * 
+     * @param DF_Web_Routing_Config_Action $config
+     */
     protected function init_local($config) {}
 
 

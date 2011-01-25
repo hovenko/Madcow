@@ -120,7 +120,7 @@ class DF_Web {
     protected function setup_error_handler() {
         set_error_handler(
             array($this, 'default_error_handler'),
-            E_ALL & ~E_STRICT & ~E_NOTICE
+            E_ALL & ~E_STRICT & ~E_NOTICE & ~E_DEPRECATED
         );
     }
 
@@ -135,6 +135,7 @@ class DF_Web {
             // internal code
             throw new DF_Web_Exception("$errstr errno:$errno file:$errfile line:$errline");
         }
+        
         self::$LOGGER->warn("$errstr $errno $errfile $errline");
     }
 

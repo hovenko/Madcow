@@ -16,6 +16,11 @@ class DF_Web_Routing {
 
     protected $config       = NULL;
 
+    /**
+     * 
+     * @see DF_Web_Routing_ActionChain
+     * @var array
+     */
     protected $chained      = array();
 
     private $c;
@@ -78,64 +83,89 @@ class DF_Web_Routing {
     }
 
 
+    /**
+     * 
+     * 
+     * @param array $actions
+     * @throws DF_Web_Exception
+     * @return array
+     */
     static protected function resolve_chained_actions($actions) {
         $resolved = array();
 
         foreach ($actions as $actionpath => $action) {
-            if (! $action instanceof DF_Web_Routing_Action_Chained) {
-                continue;
+            $chain = self::upgradeActionToActionChain($actionpath, $action, $actions);
+
+            if ($chain) {
+                #error_log("Chain $action:\n".$chain->toDebugString());
+                $resolved[] = $chain;
             }
-
-            if (!$action->is_endpoint()) {
-                continue;
-            }
-
-            $chain = new DF_Web_Routing_ActionChain($action);
-
-            $more = true;
-
-            $chained    = $action;
-            $nextpath   = $actionpath;
-            $path       = NULL;
-
-            while ($more) {
-                if ($path && "$path") {
-                    $path   = $chained->get_path_match()->append_path($path);
-                }
-                else {
-                    $path   = $chained->get_path_match();
-                }
-
-                # TODO implement recursion
-                if ($chained->is_chained_root()) {
-                    $more = false;
-                }
-                else {
-                    $chainpath = $chained->get_chained();
-
-                    if (!$chainpath) {
-                        throw new DF_Web_Exception("Missing chained on action: $nextpath");
-                    }
-
-                    if ($chained = $actions["$chainpath"]) {
-                        if (! $chained instanceof DF_Web_Routing_Action_Chained) {
-                            throw new DF_Web_Exception("Action not chained: $chainpath ($nextpath)");
-                        }
-
-                        $chain->add_to_chain($chained);
-                        $nextpath = "$chainpath";
-                    }
-                    else {
-                        throw new DF_Web_Exception("Chained action not found: $chainpath ($nextpath)");
-                    }
-                }
-            }
-
-            #error_log("Chain $action:\n".$chain->toDebugString());
-            $resolved[] = $chain;
         }
 
         return $resolved;
+    }
+    
+    
+    /**
+     * 
+     * 
+     * @param unknown_type $actionpath
+     * @param unknown_type $action
+     * @param unknown_type $actions
+     * @throws DF_Web_Exception
+     * @return DF_Web_Routing_ActionChain
+     */
+    static protected function upgradeActionToActionChain($actionpath, $action, $actions) {
+        if (! $action instanceof DF_Web_Routing_Action_Chained) {
+            return NULL;
+        }
+
+        if (!$action->is_endpoint()) {
+            return NULL;
+        }
+        
+        $chain = new DF_Web_Routing_ActionChain($action);
+
+        $more = TRUE;
+
+        $chained    = $action;
+        $nextpath   = $actionpath;
+        $path       = NULL;
+
+        while ($more) {
+            if ($path && "$path") {
+                $path   = $chained->get_path_match()->append_path($path);
+            }
+            else {
+                $path   = $chained->get_path_match();
+            }
+
+            # TODO implement recursion
+            if ($chained->is_chained_root()) {
+                $more = false;
+            }
+            else {
+                $chainpath = $chained->get_chained();
+
+                if (!$chainpath) {
+                    throw new DF_Web_Exception("Missing chained on action: $nextpath");
+                }
+
+                if ($chained = $actions["$chainpath"]) {
+                    if (! $chained instanceof DF_Web_Routing_Action_Chained) {
+                        throw new DF_Web_Exception("Action not chained: $chainpath ($nextpath)");
+                    }
+
+                    $chain->add_to_chain($chained);
+                    $nextpath = "$chainpath";
+                }
+                else {
+                    throw new DF_Web_Exception("Chained action not found: $chainpath ($nextpath)");
+                }
+            }
+        }
+        
+        return $chain;
     }
 
 
@@ -245,7 +275,21 @@ class DF_Web_Routing {
     }
 
 
+    /**
+     * 
+     * 
+     * @param DF_Web_Path $path
+     * @param DF_Web_Routing_ActionChain $chain
+     * @return integer
+     */
     static protected function chained_match($path, $chain) {
+        if (!$path instanceof DF_Web_Path) {
+            throw new DF_Error_InvalidArgumentException("path", $path, "DF_Web_Path");
+        }
+        if (!$chain instanceof DF_Web_Routing_ActionChain) {
+            throw new DF_Error_InvalidArgumentException("chain", $chain, "DF_Web_Routing_ActionChain");
+        }
+        
         $action     = $chain->get_endpoint();
         $a_path     = $action->get_path_match();
         $a_args     = $action->get_args();
@@ -263,7 +307,7 @@ class DF_Web_Routing {
         $rest = $parts;
 
         # FIXME For chains, dont do this for normal path actions
-        foreach ($chain->get_chain_list() as $_a) {
+        foreach ($tmp = $chain->get_chain_list() as $_a) {
             $rest = self::eat_path_parts($_a, $rest);
         }
 
@@ -458,9 +502,13 @@ class DF_Web_Routing {
     }
 
 
+    /**
+     * 
+     * @param DF_Web_Path $path
+     */
     public function find_actions_by_path($path) {
         if (!$path instanceof DF_Web_Path) {
-            throw new DF_Error_InvalidArgumentException("path", $path, "DF_Web_Path");
+            throw new DF_Error_InvalidArgumentException("path", $path, DF_Web_Path);
         }
         
         $ret = array();

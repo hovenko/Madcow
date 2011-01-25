@@ -4,7 +4,7 @@
  */
 
 
-require_once 'DF/Web/Path.php';
+require_once 'DF/URL/Path/I.php';
 
 
 /**
@@ -35,7 +35,6 @@ class DF_Web_Path_Part
 
 
     static public function fromString($string) {
-        require_once 'DF/Web/Path.php';
         $path = DF_Web_Path::fromString($string);
         return new DF_Web_Path_Part($path);
     }
@@ -79,3 +78,5 @@ class DF_Web_Path_Part
     }
 
 }
+
+require_once 'DF/Web/Path.php';
