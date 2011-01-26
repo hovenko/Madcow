@@ -50,6 +50,9 @@ class DF_Web {
 
     private $resources_path = NULL;
 
+    /**
+     * @var DF_Web_Component_Loader
+     */
     protected $component_loader = NULL;
 
     protected $user         = NULL;
@@ -118,9 +121,10 @@ class DF_Web {
 
 
     protected function setup_error_handler() {
+        error_reporting(E_ALL & ~E_STRICT & ~E_NOTICE);
         set_error_handler(
             array($this, 'default_error_handler'),
-            E_ALL & ~E_STRICT & ~E_NOTICE & ~E_DEPRECATED
+            E_ALL & ~E_STRICT & ~E_NOTICE
         );
     }
 
@@ -129,14 +133,19 @@ class DF_Web {
      * The default error handler of Madcow.
      *
      * It logs all messages as warnings using the default logger.
+     * @throws DF_Web_Exception if the error happened in the DF Web framework
+     * @return boolean
      */
     public function default_error_handler($errno, $errstr, $errfile, $errline) {
         if (preg_match('#DF/Web/.*\.php#', $errfile)) {
             // internal code
-            throw new DF_Web_Exception("$errstr errno:$errno file:$errfile line:$errline");
+            if ($this->is_debug()) {
+                throw new DF_Web_Exception("$errstr (error:$errno) $errfile:$errline");
+            }
         }
         
-        self::$LOGGER->warn("$errstr $errno $errfile $errline");
+        self::$LOGGER->warn("$errstr (error:$errno) $errfile:$errline");
+        return true;
     }
 
 
@@ -364,7 +373,7 @@ class DF_Web {
                 return $component->ACCEPT_CONTEXT($this);
             }
             catch (DF_Web_Exception $ex) {
-                throw $ex;
+                throw new DF_Web_Exception("Failed to call ${class}->ACCEPT_CONTEXT(..)", $ex);
                 #throw new DF_Web_Exception(
                 #    "Failed executing {$class}->ACCEPT_CONTEXT(): "
                 #    .$ex->getMessage().", exception in "
@@ -1194,7 +1203,7 @@ class DF_Web {
         }
 
         $session = $this->session;
-        if ($uid = $session['uid']) {
+        if ($uid = @$session['uid']) {
             self::$LOGGER->info("Lookin up user by uid from session: $uid");
             $user = $this->create_empty_user();
             $user->findByUid($uid);
