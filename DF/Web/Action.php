@@ -165,6 +165,10 @@ class DF_Web_Action {
             $callback,
             $arguments
         );
+        
+        if (NULL === $ret) {
+            $ret = TRUE;
+        }
 
         return $ret;
     }
