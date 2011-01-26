@@ -26,7 +26,11 @@ require_once 'DF/Web/View.php';
 class DF_Web {
     public static $LOGGER = NULL;
 
+    /**
+     * @var DF_Web_HTTP_Request
+     */
     public $request     = NULL;
+    
     protected $actions  = NULL;
     public $response    = NULL;
     public $session     = NULL;
@@ -857,6 +861,10 @@ class DF_Web {
     }
 
 
+    /**
+     * 
+     * @param DF_Web_Action $action
+     */
     public function execute_action($action) {
         if (!$action instanceof DF_Web_Action) {
             throw new DF_Error_InvalidArgumentException("action", $action, "DF_Web_Action");
