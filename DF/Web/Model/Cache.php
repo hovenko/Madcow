@@ -17,7 +17,7 @@ class DF_Web_Model_Cache extends DF_Web_Model {
         return $this->_cache;
     }
 
-    public function initialize() {
+    public function initialize($c) {
         $class  = $this->config['cache_class'];
         $config = $this->config['cache_config'];
 
