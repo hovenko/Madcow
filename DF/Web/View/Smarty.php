@@ -22,6 +22,10 @@ class DF_Web_View_Smarty extends DF_Web_View {
         'layout'            => 'layout.tpl',
         'wrapper'           => 'html.tpl',
         'error'             => 'error.tpl',
+        'templates_dir'		=> NULL,
+        'compile_dir'		=> NULL,
+        'cache_dir'			=> NULL,
+        'plugins_dir'		=> NULL,
     );
 
 
@@ -44,7 +48,7 @@ class DF_Web_View_Smarty extends DF_Web_View {
     /**
      * Sets up the Smarty template engine.
      */
-    public function initialize() {
+    public function initialize($c) {
         $config = $this->config();
 
         $smarty = new Smarty();
@@ -56,19 +60,19 @@ class DF_Web_View_Smarty extends DF_Web_View {
         $smarty->compile_dir    = "$app_root/templates_c";
         $smarty->cache_dir      = "$app_root/smarty/cache";
 
-        if (@$tmp = $config['templates_dir']) {
+        if ($tmp = $config['templates_dir']) {
             $smarty->templates_dir  = $tmp;
         }
 
-        if (@$tmp = $config['compile_dir']) {
+        if ($tmp = $config['compile_dir']) {
             $smarty->compile_dir    = $tmp;
         }
 
-        if (@$tmp = $config['cache_dir']) {
+        if ($tmp = $config['cache_dir']) {
             $smarty->cache_dir    = $tmp;
         }
 
-        if (@$tmp = $config['plugins_dir']) {
+        if ($tmp = $config['plugins_dir']) {
             if (!is_array($tmp)) {
                 $tmp = array($tmp);
             }
