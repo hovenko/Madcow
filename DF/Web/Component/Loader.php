@@ -67,6 +67,11 @@ class DF_Web_Component_Loader {
             throw new DF_Web_Component_LoaderException("Class $name does not implement DF_Web_Component");
         }
 
+        if ($config = $component->config()) {
+            $config = $context->resolve_config_placeholders($config);
+            $component->set_config($config);
+        }
+
         $configname = self::config_name($name, $base);
         $config = $this->c->config()->find_by_id($configname);
         if ($config == NULL) {

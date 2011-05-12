@@ -171,6 +171,42 @@ class DF_Web {
     }
 
 
+    public function resolve_config_placeholders($config) {
+        $resolved = array();
+
+        foreach ($config as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->resolve_config_placeholders($value);
+            }
+            elseif (is_string($value) && preg_match('#__\w+__#', $value)) {
+                $value = $this->resolve_placeholders($value);
+            }
+            else {
+                // ok
+            }
+
+            $resolved[$key] = $value;
+        }
+
+        return $resolved;
+    }
+
+
+    protected function resolve_placeholders($string) {
+        if (!is_string($string)) {
+            throw new DF_Error_InvalidArgumentException("string", $string, "string");
+        }
+
+        $env = DF_Web_Environment::singleton();
+        $app_root   = $env->app_root;
+        $web_root   = $this->uri_for("/");
+
+        $string = preg_replace("#__APPROOT__/?#", $app_root, $string);
+        $string = preg_replace("#__WEBROOT__/?#", $web_root, $string);
+        return $string;
+    }
+
+
     public function setup_include_path() {
         $config     = $this->getConfig();
         $conf_php   = DF_Util_Arrays::asArray($config['php']);

@@ -23,6 +23,14 @@ class DF_Web_Component {
         return $this->config;
     }
 
+
+    public function set_config($config) {
+        if (!is_array($config)) {
+            throw new DF_Error_InvalidArgumentException("config", $config, "array");
+        }
+        $this->config = $config;
+    }
+
     
     /**
      * Called after configuration is set.
