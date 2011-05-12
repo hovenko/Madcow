@@ -50,7 +50,7 @@ class DF_Web_Config {
         if ($env->debug)
         self::$LOGGER->debug("Looking up configuration files in '$app_root'");
 
-        # TODO configurable
+        # TODO configurable and detect changes by timestamp
         $compiled_file  = File::buildPath(array($app_root, "cache", "$basename-compiled.php"));
         if (file_exists($compiled_file)) {
             global $config;
